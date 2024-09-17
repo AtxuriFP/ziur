@@ -25,7 +25,7 @@
   <!-- Logos de centros educativos -->
   <div>
     <img src="images/atxuri.png" alt="Emilio Campuzano LHII" height="100">
-    <img src="images/andramari.png" alt="FP Andramari" height="100">
+    <img src="images/andramari.PNG" alt="FP Andramari" height="100">
   </div>
 
   <!-- Logos de empresas colaboradoras -->
