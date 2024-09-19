@@ -1,10 +1,8 @@
-# ZIUR: Soulbound Token bidezko gaitasun profesionalen ziurtapena 🎓
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/AtxuriFP/ziur">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
+    <img src="images/tknika.png" alt="Logo" height="150">
   </a>
 
   <h3 align="center">ZIUR: gaitasun profesionalen zertifikazioa Soulbound Token bidez 🎓</h3>
@@ -30,8 +28,8 @@
 
   <!-- Logos de empresas colaboradoras -->
   <div>
-    <img src="images/ehu.jpg" alt="UPV/EHU" height="100">
-    <img src="images/p4q.png" alt="P4Q" height="100">
+    <img src="images/ehu.jpg" alt="UPV/EHU" height="50">
+    <img src="images/p4q.png" alt="P4Q" height="50">
   </div>
 </div>
 
@@ -70,7 +68,7 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
+Gaur egungo lan-ingurune global eta dinamikoan gaitasunak ziurtatzeko beharretik sortu da ZIUR proiektua. Enpresek edo hezkuntza-zentroek metodo fidagarriak behar dituzte langile zein ikasleen gaitasun tekniko, digital, zein pertsonalen ziurtapena egiteko. Europar Batasunaren Blockchain estrategiarekin eta Euskal Hezkuntza Sistemaren Eraldaketa Digitalaren Planarekin bat etorriz, TKNIKAk bultzatutako proiektu honek Soulbound Tokens (SBTs) erabiltzen ditu gaitasunak modu aldaezinean erregistratzeko. P4Q elektronika enpresa eta UPV/EHU-ren berrikuntza sailarekin elkarlanean, prototipo bat garatuko da gaitasun horiek ziurtatzeko.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
