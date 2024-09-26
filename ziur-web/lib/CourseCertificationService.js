@@ -9,12 +9,13 @@ class CourseCertificationService {
         this.certificateMinterContract = null;
         this.account = null;
         this.isInitialized = false;
+        this.chainId = null;
         
         // Configuration object
         this.config = {
-            courseCertificationAddress: '0xDaB0cA9e8a3Dad4BfE57D4Cd602F0d422113d630', // You'll need to set this
-            certificateMinterAddress: '0x55B0d96324C547c09BdF6E8b23FF40D1dEd485C0', // You'll need to set this
-            rpcUrl: 'https://sepolia.infura.io/v3/ab7c969b633f41b8a1bde81b685a5142', // Default to local Ganache, change as needed
+            courseCertificationAddress: '0xDaB0cA9e8a3Dad4BfE57D4Cd602F0d422113d630',
+            certificateMinterAddress: '0x55B0d96324C547c09BdF6E8b23FF40D1dEd485C0',
+            rpcUrl: 'https://sepolia.infura.io/v3/ab7c969b633f41b8a1bde81b685a5142',
         };
     }
 
@@ -44,6 +45,9 @@ class CourseCertificationService {
             const accounts = await this.web3.eth.getAccounts();
             this.account = accounts[0];
 
+            // Get the chain ID
+            this.chainId = await this.web3.eth.getChainId();
+
             // Initialize contracts
             this.courseCertificationContract = new this.web3.eth.Contract(
                 CourseCertificationABI,
@@ -59,6 +63,9 @@ class CourseCertificationService {
             if (window.ethereum) {
                 window.ethereum.on('accountsChanged', (accounts) => {
                     this.account = accounts[0];
+                });
+                window.ethereum.on('chainChanged', (chainId) => {
+                    this.chainId = chainId;
                 });
             }
 
@@ -199,6 +206,135 @@ class CourseCertificationService {
                 .send({ from: this.account });
         } catch (error) {
             console.error("Failed to recover certificate:", error);
+            throw error;
+        }
+    }
+
+    async getTotalCertificates() {
+        await this.init();
+        try {
+            // ERC1155Supply provides a total supply function
+            const totalSupply = await this.courseCertificationContract.methods.totalSupply().call();
+            return totalSupply;
+        } catch (error) {
+            console.error("Failed to get total certificates:", error);
+            throw error;
+        }
+    }
+
+    async getTotalStudents() {
+        await this.init();
+        try {
+            // This is not directly available in the contract.
+            // We'll need to calculate it based on the courses and certificates issued.
+            const courses = await this.getCourses();
+            const uniqueStudents = new Set();
+            
+            for (let course of courses) {
+                const certificateHolders = await this.courseCertificationContract.methods.balanceOf(null, course.id).call();
+                for (let holder of certificateHolders) {
+                    uniqueStudents.add(holder);
+                }
+            }
+            
+            return uniqueStudents.size;
+        } catch (error) {
+            console.error("Failed to get total students:", error);
+            throw error;
+        }
+    }
+
+    async getCurrentSigner() {
+        await this.init();
+        try {
+            const signer = await this.certificateMinterContract.methods.signer().call();
+            return signer;
+        } catch (error) {
+            console.error("Failed to get current signer:", error);
+            throw error;
+        }
+    }
+
+    async changeSigner(newSignerAddress) {
+        await this.init();
+        try {
+            await this.certificateMinterContract.methods.setSigner(newSignerAddress)
+                .send({ from: this.account });
+        } catch (error) {
+            console.error("Failed to change signer:", error);
+            throw error;
+        }
+    }
+
+    async generateMintingRequest(studentAddress, courseId, expirationTime) {
+        await this.init();
+        try {
+            const deadline = Math.floor(Date.now() / 1000) + expirationTime * 3600; // Convert hours to seconds
+            const nonce = await this.certificateMinterContract.methods.nonces(studentAddress).call();
+            const messageHash = this.web3.utils.soliditySha3(
+                { t: 'address', v: studentAddress },
+                { t: 'uint256', v: courseId },
+                { t: 'uint256', v: deadline },
+                { t: 'uint256', v: this.chainId },
+                { t: 'uint256', v: nonce }
+            );
+            
+            // Use personal_sign instead of eth_sign
+            const signature = await this.web3.eth.personal.sign(
+                messageHash,
+                this.account,
+                '' // password (empty for MetaMask as it manages the keys)
+            );
+            
+            return {
+                studentAddress,
+                courseId,
+                deadline,
+                signature
+            };
+        } catch (error) {
+            console.error("Failed to generate minting request:", error);
+            throw error;
+        }
+    }
+
+    async getRecentCertificates(limit = 10) {
+        await this.init();
+        try {
+            const events = await this.courseCertificationContract.getPastEvents('CertificateIssued', {
+                fromBlock: 'latest',
+                toBlock: 'latest'
+            });
+
+            return events.slice(0, limit).map(event => ({
+                courseId: event.returnValues.courseId,
+                studentAddress: event.returnValues.student,
+                issuedAt: new Date(event.blockTimestamp * 1000)
+            }));
+        } catch (error) {
+            console.error("Failed to get recent certificates:", error);
+            throw error;
+        }
+    }
+
+    async mintCertificate(studentAddress, courseId, signature) {
+        await this.init();
+        try {
+            // Get the current timestamp for the deadline
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            
+            // Call the mint function on the CertificateMinter contract
+            const result = await this.certificateMinterContract.methods.mint(
+                studentAddress,
+                courseId,
+                currentTimestamp,
+                signature
+            ).send({ from: this.account });
+
+            console.log('Certificate minted successfully:', result);
+            return result;
+        } catch (error) {
+            console.error("Failed to mint certificate:", error);
             throw error;
         }
     }

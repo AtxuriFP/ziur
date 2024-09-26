@@ -1,0 +1,124 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Admin Dashboard">
+	<main>
+		<h1>Admin Dashboard</h1>
+		
+		<section class="quick-links">
+			<h2>Quick Links</h2>
+			<div class="link-container">
+				<a href="/admin/courses" class="dashboard-link">Course Management</a>
+				<a href="/admin/certificates" class="dashboard-link">Certificate Issuance</a>
+			</div>
+		</section>
+
+		<section class="signer-management">
+			<h2>Signer Management</h2>
+			<div id="currentSigner">Loading current signer...</div>
+			<form id="changeSignerForm">
+				<label for="newSignerAddress">New Signer Address:</label>
+				<input type="text" id="newSignerAddress" name="newSignerAddress" required>
+				<button type="submit">Change Signer</button>
+			</form>
+		</section>
+	</main>
+</Layout>
+
+<script>
+	import CourseCertificationService from '../../../lib/CourseCertificationService';
+
+	async function loadCurrentSigner() {
+		try {
+			const currentSigner = await CourseCertificationService.getCurrentSigner();
+			const signerContainer = document.getElementById('currentSigner');
+			if (signerContainer) {
+				signerContainer.innerHTML = `<p>Current Signer: ${currentSigner}</p>`;
+			}
+		} catch (error) {
+			console.error('Error loading current signer:', error);
+			const signerContainer = document.getElementById('currentSigner');
+			if (signerContainer) {
+				signerContainer.innerHTML = '<p>Error loading current signer. Please try again later.</p>';
+			}
+		}
+	}
+
+	// Change Signer Form Submission
+	const changeSignerForm = document.getElementById('changeSignerForm') as HTMLFormElement;
+	changeSignerForm?.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const newSignerAddress = formData.get('newSignerAddress') as string;
+		
+		try {
+			await CourseCertificationService.changeSigner(newSignerAddress);
+			alert('Signer changed successfully!');
+			loadCurrentSigner(); // Refresh the current signer display
+			(e.target as HTMLFormElement).reset(); // Reset the form
+		} catch (error) {
+			console.error('Error changing signer:', error);
+			alert('Failed to change signer. Please try again.');
+		}
+	});
+
+	// Load current signer when the page loads
+	document.addEventListener('DOMContentLoaded', loadCurrentSigner);
+</script>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	h1, h2 {
+		margin-bottom: 1em;
+	}
+	section {
+		margin-bottom: 2em;
+		background: rgba(var(--accent-light), 12%);
+		border-radius: 8px;
+		padding: 1em;
+	}
+	.link-container {
+		display: flex;
+		gap: 1em;
+	}
+	.dashboard-link {
+		background: var(--accent-gradient);
+		color: white;
+		text-decoration: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		transition: background-color 0.3s ease;
+	}
+	.dashboard-link:hover {
+		background: var(--accent-dark);
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+	input {
+		padding: 0.5em;
+		border-radius: 4px;
+		border: 1px solid #ccc;
+		background-color: #fff;
+		color: #333;
+	}
+	button {
+		background: var(--accent-gradient);
+		color: white;
+		border: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+</style>

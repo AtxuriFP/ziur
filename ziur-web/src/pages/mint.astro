@@ -1,0 +1,140 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Mint Your Certificate">
+	<main>
+		<h1>Mint Your Certificate</h1>
+		
+		<section class="minting-form">
+			<h2>Enter Minting Details</h2>
+			<form id="mintingForm">
+				<label for="studentAddress">Your Ethereum Address:</label>
+				<input type="text" id="studentAddress" name="studentAddress" required>
+
+				<label for="courseId">Course ID:</label>
+				<input type="number" id="courseId" name="courseId" required>
+
+				<label for="signature">Signature:</label>
+				<input type="text" id="signature" name="signature" required>
+
+				<button type="submit">Mint Certificate</button>
+			</form>
+			<div id="mintingResult"></div>
+		</section>
+
+		<section class="instructions">
+			<h2>Instructions</h2>
+			<ol>
+				<li>Enter your Ethereum address (the one you provided to your course administrator).</li>
+				<li>Enter the Course ID provided by your administrator.</li>
+				<li>Paste the signature provided by your course administrator.</li>
+				<li>Click "Mint Certificate" to receive your certificate as an NFT.</li>
+			</ol>
+			<p>Note: Ensure you're connected to the correct network in your Web3 wallet (e.g., MetaMask) before minting.</p>
+		</section>
+	</main>
+</Layout>
+
+<script>
+	import CourseCertificationService from '../../lib/CourseCertificationService';
+
+	async function mintCertificate(studentAddress: string, courseId: number, signature: string) {
+		try {
+			await CourseCertificationService.mintCertificate(studentAddress, courseId, signature);
+			const resultElement = document.getElementById('mintingResult');
+			if (resultElement) {
+				resultElement.innerHTML = `
+					<h3>Certificate Minted Successfully!</h3>
+					<p>Congratulations! Your certificate for Course ID ${courseId} has been minted to your address: ${studentAddress}</p>
+				`;
+			}
+		} catch (error: unknown) {
+			console.error('Error minting certificate:', error);
+			const resultElement = document.getElementById('mintingResult');
+			if (resultElement) {
+				resultElement.innerHTML = `
+					<h3>Error Minting Certificate</h3>
+					<p>An error occurred while minting your certificate. Please try again or contact support.</p>
+					<p>Error details: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+				`;
+			}
+		}
+	}
+
+	// Minting Form Submission
+	const mintingForm = document.getElementById('mintingForm') as HTMLFormElement;
+	mintingForm?.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const studentAddress = formData.get('studentAddress') as string;
+		const courseId = parseInt(formData.get('courseId') as string);
+		const signature = formData.get('signature') as string;
+		
+		await mintCertificate(studentAddress, courseId, signature);
+	});
+
+	// Check if Web3 is available and on the correct network
+	document.addEventListener('DOMContentLoaded', async () => {
+		try {
+			await CourseCertificationService.init();
+			console.log('Web3 initialized successfully');
+		} catch (error: unknown) {
+			console.error('Failed to initialize Web3:', error);
+			alert('Please make sure you have a Web3 wallet installed and you\'re connected to the correct network.');
+		}
+	});
+</script>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	h1, h2 {
+		margin-bottom: 1em;
+	}
+	section {
+		margin-bottom: 2em;
+		background: rgba(var(--accent-light), 12%);
+		border-radius: 8px;
+		padding: 1em;
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+	input {
+		padding: 0.5em;
+		border-radius: 4px;
+		border: 1px solid #ccc;
+		background-color: #fff;
+		color: #333;
+	}
+	button {
+		background: var(--accent-gradient);
+		color: white;
+		border: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+	ol {
+		padding-left: 1.5em;
+	}
+	li {
+		margin-bottom: 0.5em;
+	}
+	#mintingResult {
+		margin-top: 1em;
+		padding: 1em;
+		border-radius: 4px;
+		background-color: rgba(var(--accent-dark), 0.2);
+	}
+</style>

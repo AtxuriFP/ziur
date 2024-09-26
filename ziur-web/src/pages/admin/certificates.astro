@@ -1,0 +1,180 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Certificate Issuance">
+	<main>
+		<h1>Certificate Issuance</h1>
+		
+		<section class="minting-request">
+			<h2>Generate Minting Request</h2>
+			<form id="mintingRequestForm">
+				<label for="studentAddress">Student Address:</label>
+				<input type="text" id="studentAddress" name="studentAddress" required>
+
+				<label for="courseSelect">Course:</label>
+				<select id="courseSelect" name="courseId" required>
+					<option value="">Select a course</option>
+					<!-- Course options will be populated dynamically -->
+				</select>
+
+				<label for="expirationTime">Expiration Time (in hours):</label>
+				<input type="number" id="expirationTime" name="expirationTime" required>
+
+				<button type="submit">Generate Request</button>
+			</form>
+			<div id="mintingResult"></div>
+		</section>
+
+		<section class="recent-certificates">
+			<h2>Recently Issued Certificates</h2>
+			<div id="recentCertificates">Loading recent certificates...</div>
+		</section>
+	</main>
+</Layout>
+
+<script>
+	import CourseCertificationService from '../../../lib/CourseCertificationService';
+
+	interface Certificate {
+		courseId: number;
+		studentAddress: string;
+		issuedAt: Date;
+	}
+
+	interface Course {
+		id: number;
+		name: string;
+	}
+
+	async function loadCourses() {
+		try {
+			const courses = await CourseCertificationService.getCourses();
+			const courseSelect = document.getElementById('courseSelect') as HTMLSelectElement;
+			courses.forEach((course: Course) => {
+				const option = document.createElement('option');
+				option.value = course.id.toString();
+				option.textContent = `${course.name} (ID: ${course.id})`;
+				courseSelect.appendChild(option);
+			});
+		} catch (error) {
+			console.error('Error loading courses:', error);
+			alert('Failed to load courses. Please refresh the page and try again.');
+		}
+	}
+
+	async function generateMintingRequest(studentAddress: string, courseId: number, expirationTime: number) {
+		try {
+			const result = await CourseCertificationService.generateMintingRequest(studentAddress, courseId, expirationTime);
+			const resultElement = document.getElementById('mintingResult');
+			if (resultElement) {
+				resultElement.innerHTML = `
+					<h3>Minting Request Generated</h3>
+					<p>Student Address: ${result.studentAddress}</p>
+					<p>Course ID: ${result.courseId}</p>
+					<p>Expiration: ${new Date(result.deadline * 1000).toLocaleString()}</p>
+					<p>Signature: ${result.signature}</p>
+				`;
+			}
+		} catch (error) {
+			console.error('Error generating minting request:', error);
+			alert('Failed to generate minting request. Please try again.');
+		}
+	}
+
+	async function loadRecentCertificates() {
+		try {
+			const certificates = await CourseCertificationService.getRecentCertificates();
+			const certificatesElement = document.getElementById('recentCertificates');
+			if (certificatesElement) {
+				if (certificates.length > 0) {
+					certificatesElement.innerHTML = `
+						<ul>
+							${certificates.map((cert: Certificate) => `
+								<li>
+									Course ID: ${cert.courseId},
+									Student: ${cert.studentAddress},
+									Issued: ${cert.issuedAt.toLocaleString()}
+								</li>
+							`).join('')}
+						</ul>
+					`;
+				} else {
+					certificatesElement.innerHTML = '<p>No recent certificates found.</p>';
+				}
+			}
+		} catch (error) {
+			console.error('Error loading recent certificates:', error);
+			const certificatesElement = document.getElementById('recentCertificates');
+			if (certificatesElement) {
+				certificatesElement.innerHTML = '<p>Error loading recent certificates. Please try again later.</p>';
+			}
+		}
+	}
+
+	// Minting Request Form Submission
+	const mintingRequestForm = document.getElementById('mintingRequestForm') as HTMLFormElement;
+	mintingRequestForm?.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const studentAddress = formData.get('studentAddress') as string;
+		const courseId = parseInt(formData.get('courseId') as string);
+		const expirationTime = parseInt(formData.get('expirationTime') as string);
+		
+		await generateMintingRequest(studentAddress, courseId, expirationTime);
+	});
+
+	// Load courses and recent certificates when the page loads
+	document.addEventListener('DOMContentLoaded', () => {
+		loadCourses();
+		loadRecentCertificates();
+	});
+</script>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	h1, h2 {
+		margin-bottom: 1em;
+	}
+	section {
+		margin-bottom: 2em;
+		background: rgba(var(--accent-light), 12%);
+		border-radius: 8px;
+		padding: 1em;
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+	input, select {
+		padding: 0.5em;
+		border-radius: 4px;
+		border: 1px solid #ccc;
+		background-color: #fff;
+		color: #333;
+	}
+	button {
+		background: var(--accent-gradient);
+		color: white;
+		border: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+	ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	li {
+		margin-bottom: 0.5em;
+	}
+</style>
