@@ -7,7 +7,7 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">ZIUR: gaitasun profesionalen zertifikazioa Soulbound Token bidez 🎓</h3>
+  <h3 align="center">ZIUR: Soulbound Token bidezko gaitasun profesionalen ziurtapena 🎓</h3>
 
   <p align="center">
     project_description
@@ -30,8 +30,8 @@
 
   <!-- Logos de empresas colaboradoras -->
   <div>
-    <img src="images/ehu.jpg" alt="UPV/EHU" height="100">
-    <img src="images/p4q.png" alt="P4Q" height="100">
+    <img src="images/ehu.jpg" alt="UPV/EHU" height="60">
+    <img src="images/p4q.png" alt="P4Q" height="60">
   </div>
 </div>
 

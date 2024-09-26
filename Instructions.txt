@@ -1,0 +1,139 @@
+# Soulbound Token (SBT) Course Completion Certificates Project
+
+## Project Overview
+
+This project aims to create a web application using Astro.js for emitting, verifying, and managing course completion certificates based on Soulbound Tokens (SBTs). The project includes both frontend development with Astro.js and smart contract development for the blockchain functionality.
+
+## Project Structure
+
+```
+sbt-certificates/
+├── src/
+│   ├── pages/
+│   │   ├── index.astro
+│   │   ├── admin/
+│   │   │   ├── dashboard.astro
+│   │   │   ├── courses.astro
+│   │   │   └── certificates.astro
+│   │   ├── verify.astro
+│   │   └── mint.astro
+│   ├── layouts/
+│   │   └── Layout.astro
+│   ├── components/
+│   │   └── (Reusable components)
+│   └── styles/
+│       └── global.css
+├── public/
+│   └── (Static assets)
+├── contracts/
+│   ├── CourseCertification.sol
+│   └── CertificateMinter.sol
+├── test/
+│   ├── CourseCertification.test.js
+│   └── CertificateMinter.test.js
+├── lib/
+│   └── blockchainService.js
+├── astro.config.mjs
+├── package.json
+└── README.md
+```
+
+## Smart Contract Development
+
+We have created two main contracts:
+
+1. `CourseCertification.sol`: Manages courses and certificates (based on ERC1155).
+2. `CertificateMinter.sol`: Handles secure minting of certificates.
+
+### CourseCertification.sol
+- Inherit from ERC1155, Ownable, and Pausable
+- Implement functions:
+  - `createCourse`: Add a new course (token type)
+  - `updateCourse`: Modify existing course details
+  - `issueCertificate`: Mint a certificate for a student
+  - `getCourseDetails`: Retrieve course information
+  - `recover`: Allow recovery of certificates to a new address
+
+  Additional features:
+    • Soulbound token functionality (non-transferable certificates)
+    • Minter role management (add/remove minters)
+    • Pausable functionality for all transfers
+    • Custom URI for token metadata
+
+### CertificateMinter.sol
+- Inherit from Ownable and Nonces
+- Implement functions:
+  - `mint`: Mint a certificate for a student (with signature verification)
+  - `verifySignature`: Verify the validity of a minting signature
+  - `setSigner`: Update the signer address
+  - `recover`: Proxy function to recover certificates via CourseCertification contract
+
+Key Security Features:
+- ECDSA signature verification for minting
+- Nonce management to prevent replay attacks
+- Chain ID verification
+- Separate signer role for enhanced security
+- Deadline checks for signature expiration
+
+## Astro.js Development
+
+Focus on creating the following key pages:
+
+1. Admin Dashboard (`admin/dashboard.astro`)
+   - Overview of system statistics
+   - Links to course management and certificate issuance
+   - Signer management interface
+
+2. Course Management (`admin/courses.astro`)
+   - List existing courses
+   - Form to add new courses
+   - Edit course details
+
+3. Certificate Issuance (`admin/certificates.astro`)
+   - Form to generate signed minting requests
+   - List of recently issued certificates
+
+4. Public Verification Page (`verify.astro`)
+   - Form to input certificate ID
+   - Display verification results
+
+5. Minting Page (`mint.astro`)
+   - Allow students to mint their certificates using signed requests
+
+## Blockchain Interaction Service
+
+Update `blockchainService.js` to handle all blockchain interactions. We will use web3.js library:
+
+- Connect to wallet (MetaMask)
+- Read and write operations for both smart contracts
+- Handle transaction signing and gas estimation
+- Implement error handling and transaction monitoring
+- Add functions for signature generation and verification
+
+Remember to handle errors gracefully, implement proper security measures, and follow best practices for both blockchain and web development throughout the project.
+
+## Development Steps
+
+1. Set up the Astro.js project and create the basic file structure.
+2. Develop and test the `CourseCertification.sol` contract, implementing ERC1155 and soulbound features.
+3. Develop and test the `CertificateMinter.sol` contract, focusing on secure minting processes.
+4. Implement the Astro.js pages, starting with the admin dashboard and minting page.
+5. Create the blockchain interaction service and integrate it into the Astro.js pages.
+6. Develop the public verification page.
+7. Implement the signature generation process for certificate issuance.
+8. Style the application for a polished user experience.
+9. Conduct thorough testing of both smart contracts and the web application.
+10. Deploy the smart contracts to a testnet and the web application to a hosting platform.
+
+## Next Steps
+
+1. Implement the `CourseCertification.sol` contract.
+2. Implement the `CertificateMinter.sol` contract, focusing on signature verification and secure minting.
+3. Update the admin dashboard to include signer management features.
+4. Create a new minting page for students to use signed minting requests.
+5. Implement the signature generation process in the certificate issuance page.
+6. Ensure the blockchain service can handle all new contract functions, including signature verification and nonce management.
+7. Update the verification page to work with the new ERC1155-based certificate structure.
+
+CourseCertification AT 0xDaB0cA9e8a3Dad4BfE57D4Cd602F0d422113d630
+CertificateMinter AT 0x55B0d96324C547c09BdF6E8b23FF40D1dEd485C0

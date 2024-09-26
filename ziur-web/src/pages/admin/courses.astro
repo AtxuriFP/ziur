@@ -1,0 +1,276 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Course Management">
+	<main>
+		<h1>Course Management</h1>
+		
+		<section class="course-list">
+			<h2>Existing Courses</h2>
+			<div id="courseList">Loading courses...</div>
+		</section>
+
+		<section class="add-course">
+			<h2>Add New Course</h2>
+			<form id="addCourseForm">
+				<label for="courseName">Course Name:</label>
+				<input type="text" id="courseName" name="courseName" required>
+
+				<label for="description">Description:</label>
+				<textarea id="description" name="description" required></textarea>
+
+				<label for="trainerName">Trainer Name:</label>
+				<input type="text" id="trainerName" name="trainerName" required>
+
+				<label for="startDate">Start Date:</label>
+				<input type="date" id="startDate" name="startDate" required>
+
+				<label for="endDate">End Date:</label>
+				<input type="date" id="endDate" name="endDate" required>
+
+				<label for="durationInHours">Duration (hours):</label>
+				<input type="number" id="durationInHours" name="durationInHours" required>
+
+				<button type="submit">Add Course</button>
+			</form>
+		</section>
+
+		<div id="editCourseModal" class="modal">
+			<div class="modal-content">
+				<h2>Edit Course</h2>
+				<form id="editCourseForm">
+					<input type="hidden" id="editCourseId" name="editCourseId">
+					<label for="editCourseName">Course Name:</label>
+					<input type="text" id="editCourseName" name="courseName" required>
+
+					<label for="editDescription">Description:</label>
+					<textarea id="editDescription" name="description" required></textarea>
+
+					<label for="editTrainerName">Trainer Name:</label>
+					<input type="text" id="editTrainerName" name="trainerName" required>
+
+					<label for="editStartDate">Start Date:</label>
+					<input type="date" id="editStartDate" name="startDate" required>
+
+					<label for="editEndDate">End Date:</label>
+					<input type="date" id="editEndDate" name="endDate" required>
+
+					<label for="editDurationInHours">Duration (hours):</label>
+					<input type="number" id="editDurationInHours" name="durationInHours" required>
+
+					<label for="editActive">
+						<input type="checkbox" id="editActive" name="editActive">
+						Active
+					</label>
+					<button type="submit">Update Course</button>
+					<button type="button" id="closeModal">Cancel</button>
+				</form>
+			</div>
+		</div>
+	</main>
+</Layout>
+
+<script>
+	import CourseCertificationService from '../../../lib/CourseCertificationService';
+
+	interface Course {
+		id: number;
+		name: string;
+		description: string;
+		trainerName: string;
+		startDate: Date;
+		endDate: Date;
+		durationInHours: number;
+		active: boolean;
+	}
+
+	function formatDate(date: Date): string {
+		return date.toISOString().split('T')[0];
+	}
+
+	async function loadCourses() {
+		try {
+			const courses = await CourseCertificationService.getCourses();
+			const courseListElement = document.getElementById('courseList');
+			if (courseListElement) {
+				if (courses.length > 0) {
+					courseListElement.innerHTML = courses.map((course: Course) => `
+						<div class="course-item">
+							<h3>${course.name}</h3>
+							<p>Trainer: ${course.trainerName}</p>
+							<p>Duration: ${course.durationInHours} hours</p>
+							<p>Start Date: ${formatDate(course.startDate)}</p>
+							<p>End Date: ${formatDate(course.endDate)}</p>
+							<p>Status: ${course.active ? 'Active' : 'Inactive'}</p>
+							<button class="edit-course" data-course-id="${course.id}">Edit</button>
+						</div>
+					`).join('');
+
+					// Add event listeners to edit buttons
+					document.querySelectorAll('.edit-course').forEach(button => {
+						button.addEventListener('click', (e) => handleEditCourse(e as MouseEvent));
+					});
+				} else {
+					courseListElement.innerHTML = '<p>No courses found.</p>';
+				}
+			}
+		} catch (error) {
+			console.error('Error loading courses:', error);
+			const courseListElement = document.getElementById('courseList');
+			if (courseListElement) {
+				courseListElement.innerHTML = '<p>Error loading courses. Please try again later.</p>';
+			}
+		}
+	}
+
+	async function handleEditCourse(e: MouseEvent) {
+		const target = e.target as HTMLElement;
+		const courseId = target.dataset.courseId;
+		if (courseId) {
+			try {
+				const course = await CourseCertificationService.getCourseDetails(Number(courseId));
+				
+				// Populate edit form
+				const editCourseIdInput = document.getElementById('editCourseId') as HTMLInputElement;
+				const editCourseNameInput = document.getElementById('editCourseName') as HTMLInputElement;
+				const editDescriptionInput = document.getElementById('editDescription') as HTMLTextAreaElement;
+				const editTrainerNameInput = document.getElementById('editTrainerName') as HTMLInputElement;
+				const editStartDateInput = document.getElementById('editStartDate') as HTMLInputElement;
+				const editEndDateInput = document.getElementById('editEndDate') as HTMLInputElement;
+				const editDurationInHoursInput = document.getElementById('editDurationInHours') as HTMLInputElement;
+				const editActiveCheckbox = document.getElementById('editActive') as HTMLInputElement;
+				
+				if (editCourseIdInput) editCourseIdInput.value = courseId;
+				if (editCourseNameInput) editCourseNameInput.value = course.name;
+				if (editDescriptionInput) editDescriptionInput.value = course.description;
+				if (editTrainerNameInput) editTrainerNameInput.value = course.trainerName;
+				if (editStartDateInput) editStartDateInput.value = formatDate(course.startDate);
+				if (editEndDateInput) editEndDateInput.value = formatDate(course.endDate);
+				if (editDurationInHoursInput) editDurationInHoursInput.value = course.durationInHours.toString();
+				if (editActiveCheckbox) editActiveCheckbox.checked = course.active;
+				
+				const editCourseModal = document.getElementById('editCourseModal');
+				if (editCourseModal) editCourseModal.style.display = 'block';
+			} catch (error) {
+				console.error('Error fetching course details:', error);
+				alert('Failed to load course details. Please try again.');
+			}
+		}
+	}
+
+	// Add Course Form Submission
+	const addCourseForm = document.getElementById('addCourseForm') as HTMLFormElement;
+	addCourseForm?.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const courseData = Object.fromEntries(formData);
+		
+		try {
+			await CourseCertificationService.createCourse(courseData);
+			alert('Course added successfully!');
+			loadCourses(); // Refresh the course list
+			(e.target as HTMLFormElement).reset(); // Reset the form
+		} catch (error) {
+			console.error('Error adding course:', error);
+			alert('Failed to add course. Please try again.');
+		}
+	});
+
+	// Edit Course Form Submission
+	const editCourseForm = document.getElementById('editCourseForm') as HTMLFormElement;
+	editCourseForm?.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const courseData = Object.fromEntries(formData);
+		
+		try {
+			await CourseCertificationService.updateCourse(courseData);
+			alert('Course updated successfully!');
+			loadCourses(); // Refresh the course list
+			const editCourseModal = document.getElementById('editCourseModal');
+			if (editCourseModal) editCourseModal.style.display = 'none';
+		} catch (error) {
+			console.error('Error updating course:', error);
+			alert('Failed to update course. Please try again.');
+		}
+	});
+
+	// Close Modal
+	const closeModalButton = document.getElementById('closeModal');
+	const editCourseModal = document.getElementById('editCourseModal');
+	closeModalButton?.addEventListener('click', () => {
+		if (editCourseModal) editCourseModal.style.display = 'none';
+	});
+
+	// Load courses when the page loads
+	document.addEventListener('DOMContentLoaded', loadCourses);
+</script>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	h1, h2 {
+		margin-bottom: 1em;
+	}
+	.course-list ul {
+		list-style-type: none;
+		padding: 0;
+	}
+	.course-item {
+		background: rgba(var(--accent-light), 12%);
+		border-radius: 8px;
+		padding: 1em;
+		margin-bottom: 1em;
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+	input, textarea {
+		padding: 0.5em;
+		border-radius: 4px;
+		border: 1px solid #ccc;
+		background-color: #fff;
+		color: #333;
+	}
+	button {
+		background: var(--accent-gradient);
+		color: white;
+		border: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		cursor: pointer;
+	}
+	.modal {
+		display: none;
+		position: fixed;
+		z-index: 1;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		overflow: auto;
+		background-color: rgba(0,0,0,0.4);
+	}
+	.modal-content {
+		background-color: #fefefe;
+		margin: 15% auto;
+		padding: 20px;
+		border: 1px solid #888;
+		width: 80%;
+		max-width: 500px;
+		border-radius: 8px;
+	}
+	.modal-content form {
+		color: #333;
+	}
+</style>
