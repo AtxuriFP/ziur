@@ -14,7 +14,7 @@ class CourseCertificationService {
         // Configuration object
         this.config = {
             courseCertificationAddress: '0xDaB0cA9e8a3Dad4BfE57D4Cd602F0d422113d630',
-            certificateMinterAddress: '0x55B0d96324C547c09BdF6E8b23FF40D1dEd485C0',
+            certificateMinterAddress: '0xcc08d6d4657Bc5d92f26d69A38B2C59531afba21',
             rpcUrl: 'https://sepolia.infura.io/v3/ab7c969b633f41b8a1bde81b685a5142',
         };
     }
@@ -266,30 +266,22 @@ class CourseCertificationService {
         }
     }
 
-    async generateMintingRequest(studentAddress, courseId, expirationTime) {
+    async generateMintingRequest(studentAddress, courseId) {
         await this.init();
         try {
-            const deadline = Math.floor(Date.now() / 1000) + expirationTime * 3600; // Convert hours to seconds
             const nonce = await this.certificateMinterContract.methods.nonces(studentAddress).call();
-            const messageHash = this.web3.utils.soliditySha3(
-                { t: 'address', v: studentAddress },
-                { t: 'uint256', v: courseId },
-                { t: 'uint256', v: deadline },
-                { t: 'uint256', v: this.chainId },
-                { t: 'uint256', v: nonce }
+            const messageHash = this.web3.utils.keccak256(
+                ['address', 'uint256', 'uint256', 'uint256'],
+                [studentAddress, courseId, this.chainId, nonce]
             );
             
-            // Use personal_sign instead of eth_sign
-            const signature = await this.web3.eth.personal.sign(
-                messageHash,
-                this.account,
-                '' // password (empty for MetaMask as it manages the keys)
-            );
+            // Sign the hash directly without the Ethereum prefix
+            const signature = await this.web3.eth.sign(messageHash, this.account);
             
             return {
                 studentAddress,
                 courseId,
-                deadline,
+                nonce,
                 signature
             };
         } catch (error) {
@@ -320,14 +312,13 @@ class CourseCertificationService {
     async mintCertificate(studentAddress, courseId, signature) {
         await this.init();
         try {
-            // Get the current timestamp for the deadline
-            const currentTimestamp = Math.floor(Date.now() / 1000);
-            
+
+            const nonce = await this.certificateMinterContract.methods.nonces(studentAddress).call();          
             // Call the mint function on the CertificateMinter contract
             const result = await this.certificateMinterContract.methods.mint(
                 studentAddress,
                 courseId,
-                currentTimestamp,
+                nonce,
                 signature
             ).send({ from: this.account });
 

@@ -137,3 +137,5 @@ Remember to handle errors gracefully, implement proper security measures, and fo
 
 CourseCertification AT 0xDaB0cA9e8a3Dad4BfE57D4Cd602F0d422113d630
 CertificateMinter AT 0x55B0d96324C547c09BdF6E8b23FF40D1dEd485C0
+                   NEW 0x8F49983237Bb3826DE572fD26a797E5f2095B6B3
+                   NEW 0xcc08d6d4657Bc5d92f26d69A38B2C59531afba21

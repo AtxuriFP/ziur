@@ -28,41 +28,20 @@ contract CertificateMinter is Ownable, Nonces {
     }
 
     /* ============ Public Functions ============ */
-    function verifySignature(
-        address to,
-        uint256 courseId,
-        uint256 deadline,
-        uint256 nonce,
-        bytes memory signature
-    ) public view returns (bool) {
-        bytes32 messageHash = keccak256(
-            abi.encodePacked(to, courseId, deadline, _cachedChainId, nonce)
-        );
-        bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
-
-        return signer == ethSignedMessageHash.recover(signature);
-    }
-
-    /* ============ External Functions ============ */
     function mint(
         address to,
         uint256 courseId,
-        uint256 deadline,
+        uint256 nonce,
         bytes memory signature
     ) external {
         require(courseCertification.balanceOf(to, courseId) == 0, "Certificate already minted");
-        require(deadline >= block.timestamp, "Signature expired");
-        uint256 nonce = _useNonce(to);
-        require(
-            verifySignature(
-                to,
-                courseId,
-                deadline,
-                nonce,
-                signature
-            ),
-            "Invalid signature"
+        require(_useNonce(to) == nonce, "Invalid nonce");
+
+        bytes32 messageHash = keccak256(
+            abi.encodePacked(to, courseId, _cachedChainId, nonce)
         );
+        bytes32 ethSignedMessageHash = messageHash.toEthSignedMessageHash();
+        require(signer == ethSignedMessageHash.recover(signature), "Invalid signature");
 
         courseCertification.issueCertificate(to, courseId);
         emit CertificateMinted(to, courseId);

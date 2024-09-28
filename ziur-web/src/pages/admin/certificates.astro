@@ -18,9 +18,6 @@ import Layout from '../../layouts/Layout.astro';
 					<!-- Course options will be populated dynamically -->
 				</select>
 
-				<label for="expirationTime">Expiration Time (in hours):</label>
-				<input type="number" id="expirationTime" name="expirationTime" required>
-
 				<button type="submit">Generate Request</button>
 			</form>
 			<div id="mintingResult"></div>
@@ -65,14 +62,13 @@ import Layout from '../../layouts/Layout.astro';
 
 	async function generateMintingRequest(studentAddress: string, courseId: number, expirationTime: number) {
 		try {
-			const result = await CourseCertificationService.generateMintingRequest(studentAddress, courseId, expirationTime);
+			const result = await CourseCertificationService.generateMintingRequest(studentAddress, courseId);
 			const resultElement = document.getElementById('mintingResult');
 			if (resultElement) {
 				resultElement.innerHTML = `
 					<h3>Minting Request Generated</h3>
 					<p>Student Address: ${result.studentAddress}</p>
 					<p>Course ID: ${result.courseId}</p>
-					<p>Expiration: ${new Date(result.deadline * 1000).toLocaleString()}</p>
 					<p>Signature: ${result.signature}</p>
 				`;
 			}
