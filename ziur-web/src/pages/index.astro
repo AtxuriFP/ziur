@@ -5,37 +5,52 @@ import Card from '../components/Card.astro';
 
 <Layout title="SBT Course Completion Certificates">
 	<main>
-		<img
-			src="../../../images/logo-ziur.png"
-			alt="ZIUR Logo"
-			class="custom-logo"
-			width="200"
-		/>
-		<h1>Welcome to <span class="text-gradient">SBT Course Certificates</span></h1>
+		<div class="logo-container">
+			<img
+				src="/logo-ziur.png"
+				alt="ZIUR Logo"
+				class="custom-logo"
+				width="200"
+				height="200"
+			/>
+		</div>
+		<h1>Ongi etorri <span class="text-gradient">Soulbound Token bidezko</span> gaitasun profesionalen ziurtapen atarira</h1>
 		<p class="instructions">
-			Explore our Soulbound Token (SBT) based course completion certificate system. 
-			Securely issue, verify, and manage certificates on the blockchain.
+			ZIUR euskal Lanbide Heziketan bultzatutako ziurtapen sistema da.
+			Igorri, egiaztatu eta kudeatu era seguruan Blockchain bidezko ziurtagiriak.
 		</p>
+		<div class="partner-logos">
+			<img
+				src="/logo_nuevo-white.png"
+				alt="CIFP Emilio Campuzano LHII"
+				class="partner-logo"
+			/>
+			<img
+				src="/FP-AndraMari-LH-blanco.png"
+				alt="CIFP Andra Mari LHII"
+				class="partner-logo"
+			/>
+		</div>
 		<ul role="list" class="link-card-grid">
 			<Card
 				href="/admin/dashboard"
 				title="Admin Dashboard"
-				body="Manage courses, issue certificates, and view system statistics."
+				body="Kudeatu kurtsoak, igorri ziurtagiriak eta ikusi sistemaren estatistikak."
 			/>
 			<Card
 				href="/verify"
-				title="Verify Certificate"
-				body="Validate the authenticity of a course completion certificate."
+				title="Egiaztatu ziurtagiria"
+				body="Egiaztatu gaitasun profesionalen ziurtagiriaren benekotasuna."
 			/>
 			<Card
 				href="/mint"
-				title="Mint Certificate"
-				body="Students can mint their earned certificates using signed requests."
+				title="Minteatu ziurtagiriak"
+				body="Ikasleek lortutako ziurtagiriak minteatu ditzakete sinatutako eskariak erabiliz."
 			/>
 			<Card
 				href="https://github.com/yourusername/sbt-certificates"
-				title="GitHub Repository"
-				body="View the source code and contribute to the project."
+				title="GitHub Repositorioa"
+				body="Ikusi iturr-kodea eta egin ekarpenak proiektuari."
 			/>
 		</ul>
 	</main>
@@ -51,9 +66,30 @@ import Card from '../components/Card.astro';
 		font-size: 20px;
 		line-height: 1.6;
 	}
+	.logo-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+	.custom-logo {
+		max-width: 100%;
+		height: auto;
+	}
 	.sbt-logo {
 		margin: 0 auto;
 		display: block;
+	}
+	.partner-logos {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 2rem;
+		margin: 2rem 0;
+	}
+	.partner-logo {
+		max-width: 150px;
+		height: auto;
 	}
 	h1 {
 		font-size: 3rem;
