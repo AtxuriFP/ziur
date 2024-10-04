@@ -1,0 +1,104 @@
+---
+import Layout from '../layouts/Layout.astro';
+import CourseCertificationService from '../../lib/CourseCertificationService';
+---
+
+<Layout title="Add Minter - SBT Course Completion Certificates">
+    <main>
+        <h1>Add <span class="text-gradient">Minter</span></h1>
+        <p class="instructions">
+            Enter the address of the new minter to add them to the system.
+        </p>
+        <form id="minterForm">
+            <input
+                type="text"
+                id="minterAddress"
+                placeholder="Enter minter address"
+                required
+            />
+            <button type="submit">Add Minter</button>
+            <p id="message"></p>
+        </form>
+    </main>
+</Layout>
+
+<style>
+    main {
+        margin: auto;
+        padding: 1rem;
+        width: 800px;
+        max-width: calc(100% - 2rem);
+        color: white;
+        font-size: 20px;
+        line-height: 1.6;
+    }
+    h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        margin-bottom: 1em;
+    }
+    .text-gradient {
+        background-image: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 400%;
+        background-position: 0%;
+    }
+    .instructions {
+        margin-bottom: 2rem;
+        border: 1px solid rgba(var(--accent-light), 25%);
+        background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+    input {
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 1rem;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    button {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        background-color: #4F46E5;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #4338CA;
+    }
+</style>
+
+<script>
+    import CourseCertificationService from '../../lib/CourseCertificationService';
+
+    const form = document.getElementById('minterForm');
+    const input = document.getElementById('minterAddress');
+    const message = document.getElementById('message');
+
+    if (form && input && message) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const minterAddress = (input as HTMLInputElement).value;
+            try {
+                await CourseCertificationService.addMinter(minterAddress);
+                message.textContent = 'Minter added successfully!';
+                (input as HTMLInputElement).value = '';
+            } catch (error: any) {
+                message.textContent = 'Failed to add minter: ' + error.message;
+            }
+        });
+    }
+</script>
