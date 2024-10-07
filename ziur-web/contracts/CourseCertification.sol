@@ -17,7 +17,6 @@ struct Course {
     uint256 durationInHours;
     bool active;
 }
-//CourseCeritification Address: 0xDaB0cA9e8a3Dad4BfE57D4Cd602F0d422113d630
 
 mapping(uint256 => Course) public courses;
 mapping(uint256 => mapping(address => bool)) private _soulboundTokens;

@@ -1,6 +1,6 @@
 import Web3 from 'web3';
-import CourseCertificationABI from './CourseCertificationTR.json';
-import CertificateMinterABI from './CertificateMinterTR.json';
+import CourseCertificationABI from './CourseCertificationABI.json';
+import CertificateMinterABI from './CertificateMinterABI.json';
 
 class CourseCertificationService {
     constructor() {
@@ -13,9 +13,9 @@ class CourseCertificationService {
         
         // Configuration object
         this.config = {
-            courseCertificationAddress: '0xc2ab00bcd19fc46e12c75fe08df8185f68024a1e',
-            certificateMinterAddress: '0x083b81129b9087a20c7f874abc06ab602589cc21', 
-            rpcUrl: 'http://127.0.0.1:8545',
+            courseCertificationAddress: '0x670dfe8654c908460a6275b7777df0f64ad17367',
+            certificateMinterAddress: '0x0afebd8328807fdfe84d63eefd2fd39a250cb089', 
+            rpcUrl: 'https://sepolia.infura.io/v3/ab7c969b633f41b8a1bde81b685a5142',
         };
     }
 
