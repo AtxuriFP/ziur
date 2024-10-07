@@ -1,22 +1,45 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import Card from '../../components/Card.astro';
 ---
 
 <Layout title="Admin Dashboard">
 	<main>
-		<h1>Admin Dashboard</h1>
-		
-		<section class="quick-links">
-			<h2>Quick Links</h2>
-			<div class="link-container">
-				<a href="/admin/courses" class="dashboard-link">Course Management</a>
-				<a href="/admin/certificates" class="dashboard-link">Certificate Issuance</a>
+		<div class="top-bar">
+			<a href="/" class="home-button">Go Home</a>
+			<div class="logo-container">
+				<img
+					src="/logo-ziur.png"
+					alt="ZIUR Logo"
+					class="ziur-logo"
+					width="100"
+					height="100"
+				/>
 			</div>
-		</section>
+		</div>
+
+		<h1>Admin <span class="text-gradient">Dashboard</span></h1>
+		
+		<p class="instructions">
+			Manage courses, issue certificates, and view system statistics.
+		</p>
+
+		<ul role="list" class="link-card-grid">
+			<Card
+				href="/admin/courses"
+				title="Course Management"
+				body="Add, edit, and manage courses in the system."
+			/>
+			<Card
+				href="/admin/certificates"
+				title="Certificate Issuance"
+				body="Issue and manage professional competency certificates."
+			/>
+		</ul>
 
 		<section class="signer-management">
 			<h2>Signer Management</h2>
-			<div id="currentSigner">Loading current signer...</div>
+			<div id="currentSigner" class="current-signer">Loading current signer...</div>
 			<form id="changeSignerForm">
 				<label for="newSignerAddress">New Signer Address:</label>
 				<input type="text" id="newSignerAddress" name="newSignerAddress" required>
@@ -77,29 +100,71 @@ import Layout from '../../layouts/Layout.astro';
 		font-size: 20px;
 		line-height: 1.6;
 	}
-	h1, h2 {
-		margin-bottom: 1em;
-	}
-	section {
-		margin-bottom: 2em;
-		background: rgba(var(--accent-light), 12%);
-		border-radius: 8px;
-		padding: 1em;
-	}
-	.link-container {
+	.top-bar {
 		display: flex;
-		gap: 1em;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 2rem;
 	}
-	.dashboard-link {
-		background: var(--accent-gradient);
+	.home-button {
+		background-color: rgba(var(--accent-light), 12%);
 		color: white;
 		text-decoration: none;
 		padding: 0.5em 1em;
 		border-radius: 4px;
-		transition: background-color 0.3s ease;
+		transition: background-color 0.3s ease, color 0.3s ease;
+		border: 1px solid rgba(var(--accent-light), 25%);
 	}
-	.dashboard-link:hover {
-		background: var(--accent-dark);
+	.home-button:hover {
+		background-color: rgba(var(--accent-light), 30%);
+		color: rgba(var(--accent-light), 100%);
+	}
+	.logo-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.ziur-logo {
+		max-width: 100%;
+		height: auto;
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+	.instructions {
+		margin-bottom: 2rem;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
+		padding: 1.5rem;
+		border-radius: 8px;
+		text-align: center;
+	}
+	.link-card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+		gap: 2rem;
+		padding: 0;
+		margin-bottom: 2rem;
+	}
+	.signer-management {
+		background: rgba(var(--accent-light), 12%);
+		border-radius: 8px;
+		padding: 1.5rem;
+		margin-top: 2rem;
+	}
+	.current-signer {
+		margin-bottom: 1rem;
 	}
 	form {
 		display: flex;
@@ -109,16 +174,21 @@ import Layout from '../../layouts/Layout.astro';
 	input {
 		padding: 0.5em;
 		border-radius: 4px;
-		border: 1px solid #ccc;
-		background-color: #fff;
-		color: #333;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background-color: rgba(var(--accent-dark), 33%);
+		color: white;
 	}
 	button {
-		background: var(--accent-gradient);
+		background-color: rgba(var(--accent-light), 12%);
 		color: white;
-		border: none;
+		text-decoration: none;
 		padding: 0.5em 1em;
 		border-radius: 4px;
-		cursor: pointer;
+		transition: background-color 0.3s ease, color 0.3s ease;
+		border: 1px solid rgba(var(--accent-light), 25%);
+	}
+	button:hover {
+		background-color: rgba(var(--accent-light), 30%);
+		color: rgba(var(--accent-light), 100%);
 	}
 </style>

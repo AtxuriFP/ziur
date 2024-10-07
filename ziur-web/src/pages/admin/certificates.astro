@@ -4,8 +4,25 @@ import Layout from '../../layouts/Layout.astro';
 
 <Layout title="Certificate Issuance">
 	<main>
-		<h1>Certificate Issuance</h1>
+		<div class="top-bar">
+			<a href="/admin/dashboard" class="home-button">Back to Dashboard</a>
+			<div class="logo-container">
+				<img
+					src="/logo-ziur.png"
+					alt="ZIUR Logo"
+					class="ziur-logo"
+					width="100"
+					height="100"
+				/>
+			</div>
+		</div>
+
+		<h1>Certificate <span class="text-gradient">Issuance</span></h1>
 		
+		<p class="instructions">
+			Generate minting requests for student certificates and view recently issued certificates.
+		</p>
+
 		<section class="minting-request">
 			<h2>Generate Minting Request</h2>
 			<form id="mintingRequestForm">
@@ -20,12 +37,12 @@ import Layout from '../../layouts/Layout.astro';
 
 				<button type="submit">Generate Request</button>
 			</form>
-			<div id="mintingResult"></div>
+			<div id="mintingResult" class="minting-result"></div>
 		</section>
 
 		<section class="recent-certificates">
 			<h2>Recently Issued Certificates</h2>
-			<div id="recentCertificates">Loading recent certificates...</div>
+			<div id="recentCertificates" class="certificate-list">Loading recent certificates...</div>
 		</section>
 	</main>
 </Layout>
@@ -137,14 +154,62 @@ import Layout from '../../layouts/Layout.astro';
 		font-size: 20px;
 		line-height: 1.6;
 	}
-	h1, h2 {
+	.top-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+	.home-button {
+		background-color: rgba(var(--accent-light), 12%);
+		color: white;
+		text-decoration: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		transition: background-color 0.3s ease, color 0.3s ease;
+		border: 1px solid rgba(var(--accent-light), 25%);
+	}
+	.home-button:hover {
+		background-color: rgba(var(--accent-light), 30%);
+		color: rgba(var(--accent-light), 100%);
+	}
+	.logo-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.ziur-logo {
+		max-width: 100%;
+		height: auto;
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
 		margin-bottom: 1em;
+	}
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+	.instructions {
+		margin-bottom: 2rem;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
+		padding: 1.5rem;
+		border-radius: 8px;
+		text-align: center;
 	}
 	section {
 		margin-bottom: 2em;
 		background: rgba(var(--accent-light), 12%);
+		border: 1px solid rgba(var(--accent-light), 25%);
 		border-radius: 8px;
-		padding: 1em;
+		padding: 1.5rem;
 	}
 	form {
 		display: flex;
@@ -154,17 +219,33 @@ import Layout from '../../layouts/Layout.astro';
 	input, select {
 		padding: 0.5em;
 		border-radius: 4px;
-		border: 1px solid #ccc;
-		background-color: #fff;
-		color: #333;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background-color: rgba(var(--accent-dark), 33%);
+		color: white;
 	}
 	button {
-		background: var(--accent-gradient);
+		background-color: rgba(var(--accent-light), 12%);
 		color: white;
-		border: none;
+		text-decoration: none;
 		padding: 0.5em 1em;
 		border-radius: 4px;
-		cursor: pointer;
+		transition: background-color 0.3s ease, color 0.3s ease;
+		border: 1px solid rgba(var(--accent-light), 25%);
+	}
+	button:hover {
+		background-color: rgba(var(--accent-light), 30%);
+		color: rgba(var(--accent-light), 100%);
+	}
+	.minting-result {
+		margin-top: 1em;
+		padding: 1em;
+		background: rgba(var(--accent-light), 20%);
+		border-radius: 4px;
+	}
+	.certificate-list {
+		background: rgba(var(--accent-light), 20%);
+		border-radius: 4px;
+		padding: 1em;
 	}
 	ul {
 		list-style-type: none;
@@ -172,5 +253,12 @@ import Layout from '../../layouts/Layout.astro';
 	}
 	li {
 		margin-bottom: 0.5em;
+		padding: 0.5em;
+		background: rgba(var(--accent-light), 12%);
+		border-radius: 4px;
+		transition: background-color 0.3s ease;
+	}
+	li:hover {
+		background: rgba(var(--accent-light), 25%);
 	}
 </style>
