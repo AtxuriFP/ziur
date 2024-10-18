@@ -1,0 +1,424 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Verify Certificate">
+	<head>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+	</head>
+
+    <main>
+        <div class="top-bar">
+			<a href="/" class="home-button">Back to Home</a>
+			<div class="logo-container">
+				<img
+					src="/logo-ziur.png"
+					alt="ZIUR Logo"
+					class="ziur-logo"
+					width="100"
+					height="100"
+				/>
+			</div>
+		</div>
+
+		<h1>Verify Your <span class="text-gradient">Certificate</span></h1>
+		
+		<p class="instructions">
+			Enter the certificate details to verify its authenticity.
+		</p>
+
+		<section class="verification-form">
+			<h2>Enter Certificate Details</h2>
+			<form id="verificationForm">
+				<label for="studentAddress">Ethereum Address:</label>
+				<input type="text" id="studentAddress" name="studentAddress" required>
+
+				<label for="courseId">Course ID:</label>
+				<input type="number" id="courseId" name="courseId" required>
+
+				<button type="submit">Verify Certificate</button>
+			</form>
+			<div id="verificationResult" class="verification-result"></div>
+		</section>
+
+        <section class="badge-box" style="display: none;">
+            <div id="badgeContainer" class="badge-container"></div>
+        </section>
+
+		<section class="instructions-list">
+			<h2>Instructions</h2>
+			<ol>
+				<li>Enter the Ethereum address of the certificate holder.</li>
+				<li>Enter the Course ID of the certificate.</li>
+				<li>Click "Verify Certificate" to check its authenticity.</li>
+			</ol>
+			<p class="note">Note: This verification process checks the ownership and validity of the certificate on the blockchain.</p>
+		</section>
+	</main>
+</Layout>
+
+<script>
+	import CourseCertificationService from '../../lib/CourseCertificationService';
+
+	function formatDate(timestamp: any): string {
+		const date = new Date(typeof timestamp === 'string' ? parseInt(timestamp) * 1000 : timestamp);
+		return date.toLocaleDateString();
+	}
+
+    function generateCustomBadgeSVG(courseDetails: any, courseId: number) {
+		const startDate = formatDate(courseDetails.startDate);
+		const endDate = formatDate(courseDetails.endDate);
+
+        // Function to adjust font size for long text
+		function adjustFontSize(text: string, maxLength: number, baseFontSize: number) {
+			if (text.length > maxLength) {
+				return baseFontSize * (maxLength / text.length);
+			}
+			return baseFontSize;
+		}
+    	const courseNameFontSize = adjustFontSize(courseDetails.name, 24, 16);
+		const trainerNameFontSize = adjustFontSize(courseDetails.trainerName, 25, 12);
+
+		return `
+			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-165 272.8 263.2 296.1">
+				<style type="text/css">
+					@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&amp;display=swap');
+					.st0{fill:#989898;}
+					.st1{fill:#FFFFFF;}
+					.st2{fill:#5CBDB6;stroke:#868686;stroke-miterlimit:10;}
+					.st3{stroke:#868686;stroke-miterlimit:10;}
+					.st4{fill:#FFFFFF;stroke:#868686;stroke-miterlimit:10;}
+					.st5{fill:#8A5DA2;stroke:#868686;stroke-miterlimit:10;}
+					.st6{fill:none;}
+					.st7{font-family:'Roboto', sans-serif; font-weight:700; text-anchor:middle;}
+					.st8{font-size:${courseNameFontSize}px;}
+					.st9{font-family:'Roboto', sans-serif; font-style:italic; font-weight:300; text-anchor:middle;}
+					.st10{font-size:12px;}
+					.st11{font-family:'Roboto', sans-serif; font-weight:400; text-anchor:middle;}
+					.st12{font-family:'Roboto', sans-serif; font-weight:700; text-anchor:middle;}
+					.st13{font-size:10px;}
+                    .st14{font-size:8px;}
+                    .st15 { fill: #444444; }
+                    .st16 { fill: #EEEEEE; }
+                    .st17{font-size:5px;}
+				</style>
+				<g id="Layer_1">
+					<title>Course Certification</title>
+					<path class="st0" d="M98.2,359.4v122.9c0,9-4.8,17.3-12.6,21.8l-106.4,61.5c-7.8,4.5-17.4,4.5-25.1,0l-106.4-61.5
+						c-7.8-4.5-12.6-12.8-12.6-21.8V359.4c0-9,4.8-17.3,12.6-21.8L-46,276.1c7.8-4.5,17.4-4.5,25.1,0l106.5,61.5
+						C93.4,342.1,98.2,350.4,98.2,359.4z"/>
+					<path class="st1" d="M-33.5,554c-1.8,0-3.6-0.5-5.1-1.4L-145,491.2c-3.2-1.8-5.1-5.2-5.1-8.9V359.4c0-3.7,2-7,5.1-8.9L-38.6,289
+						c3.2-1.8,7.1-1.8,10.2,0l106.4,61.5c3.2,1.8,5.1,5.2,5.1,8.9v122.9c0,3.7-2,7-5.1,8.9l-106.4,61.5C-29.9,553.5-31.7,554-33.5,554z"
+						/>
+					<path class="st2" d="M-49.2,438.5L-49.2,438.5H-165v43.8c0,9,4.8,17.3,12.6,21.8L-46,565.5c7.8,4.5,17.4,4.5,25.1,0l106.5-61.5
+						c7.8-4.5,12.6-12.8,12.6-21.8v-43.8H-17.6l0,0L-49.2,438.5z"/>
+					<path class="st1" d="M-33.5,291.7c1.1,0,2.2,0.3,3.1,0.8L76.1,354c1.9,1.1,3.1,3.2,3.1,5.4v122.9c0,2.2-1.2,4.3-3.1,5.4
+						l-106.5,61.5c-1.9,1.1-4.3,1.1-6.2,0L-143,487.7c-1.9-1.1-3.1-3.2-3.1-5.4V359.4c0-2.2,1.2-4.3,3.1-5.4l106.4-61.5
+						C-35.6,292-34.5,291.7-33.5,291.7 M-33.5,287.7c-1.8,0-3.6,0.5-5.1,1.4L-145,350.5c-3.2,1.8-5.1,5.2-5.1,8.9v122.9
+						c0,3.7,2,7,5.1,8.9l106.4,61.5c3.2,1.8,7.1,1.8,10.2,0l106.5-61.5c3.2-1.8,5.1-5.2,5.1-8.9V359.4c0-3.7-2-7-5.1-8.9L-28.3,289
+						C-29.9,288.2-31.7,287.7-33.5,287.7L-33.5,287.7z"/>
+				</g>
+				<g id="Capa_2">
+					<g id="XMLID_1_">
+                        <path id="XMLID_11_" class="st3" d="M-48.3,335.2c0-0.5,0-0.9,0-1.5c-1.9,0-3.6,0-5.5,0c0,4.5,0,8.8,0,13.1c0,6.1,0,12.3-0.1,18.4
+                            c0,1.2,0.4,1.6,1.5,1.5c1-0.1,1.9-0.1,2.9,0c1,0.1,1.3-0.3,1.3-1.3c-0.1-4.3-0.1-8.7-0.1-13C-48.3,346.6-48.3,340.9-48.3,335.2z"
+                            />
+                        <path id="XMLID_13_" class="st3" d="M-12.6,334.5c0-0.2-0.1-0.4-0.1-0.7c-0.9,0-1.7,0.1-2.5,0c-1.2-0.1-1.7,0.4-1.9,1.6
+                            c-0.6,3.2-1.2,6.4-1.9,9.6c-0.8,3.5-1.4,7-2.5,10.3c-0.4,1.2-1,2.3-1.9,3.2l3.2,4.5c1.4-1.4,2.3-3.2,2.8-5.5
+                            C-15.7,349.8-14.1,342.2-12.6,334.5z"/>
+                        <path id="XMLID_9_" class="st3" d="M8.7,352.5c0.3-0.2,0.4-0.3,0.6-0.4c4.1-2.7,5.6-7,4.2-11.7c-1.3-4.2-4.9-6.8-9.7-6.8
+                            c-3.4,0-6.9,0-10.3,0c-0.3,0-0.6,0-0.8,0l3.3,5.2c2.6,0,5.3,0,7.9,0.1c3,0.1,4.6,1.9,4.6,4.9c0,2.5-1.9,4.2-4.7,4.3
+                            c-3,0.1-6.1,0.1-9.1,0c-0.9,0-1.2,0.3-1.2,1.2c0.1,1.1,0.1,2.1,0,3.2c0,0.9,0.2,1.2,1.2,1.2c2.1-0.1,4.3,0.1,6.5,0
+                            c1.3-0.1,2,0.4,2.7,1.4c2.3,3.5,4.6,7,7,10.5c0.2,0.3,0.6,0.9,0.9,0.9c2,0.1,4,0,6.3,0C14.8,361.7,11.8,357.2,8.7,352.5z"/>
+                        <path id="XMLID_10_" class="st3" d="M-11.4,337.7c-1.5,7.1-2.9,14.3-4.5,21.4c-0.2,1.1-0.8,2-1.2,3.1c-0.4,1-0.7,2.1-0.9,3.2
+                            c-0.1,0.7,0.3,1.1,1.1,1.1c0.9,0,1.8,0,2.8,0c1,0.1,1.6-0.4,1.8-1.4c0.8-3.6,1.6-7.2,2.3-10.8c1-4.7,1.9-9.5,2.8-14.2
+                            c0.2-1,0.7-1.3,1.7-1.3c0.5,0,1,0,1.5,0l-3.3-5.2C-10.7,333.6-10.4,333.1-11.4,337.7z"/>
+                        <path id="XMLID_15_" class="st3" d="M-31,360.9c-4.1-0.7-6.4-3.8-6.4-8.4c0-5.8,0-11.7,0-17.5c0-0.5,0-0.9-0.1-1.3
+                            c-1.9,0-3.6,0-5.4,0c0,0.6,0,1,0,1.5c0,6.2-0.1,12.4,0.1,18.6c0.1,2,0.6,4.2,1.5,6c2.8,5.5,9.2,7.9,15.2,6.3
+                            c2.4-0.6,4.4-1.7,5.9-3.2l-3.2-4.5C-25.3,360.4-28.2,361.4-31,360.9z"/>
+                        <path id="XMLID_14_" class="st2" d="M-11.4,337.7c-1.5,7.1-2.9,14.3-4.5,21.4l-1.4,3c-0.4,1-0.6,3.2-0.6,3.2c-0.1,0.4,0,1.1,0,1.1
+                            s0.7,0,1.1,0c0.9,0,1.8,0,2.8,0c1,0.1,1.6-0.4,1.8-1.4c0.8-3.6,1.6-7.2,2.3-10.8c1-4.7,1.9-9.5,2.8-14.2c0.2-1,0.7-1.3,1.7-1.3
+                            c0.5,0,1,0,1.5,0l-3.3-5.2C-10.7,333.6-10.4,333.1-11.4,337.7z"/>
+                        <path id="XMLID_16_" class="st4" d="M8.7,352.5c0.3-0.2,0.4-0.3,0.6-0.4c4.1-2.7,5.6-7,4.2-11.7c-1.3-4.2-4.9-6.8-9.7-6.8
+                            c-3.4,0-6.9,0-10.3,0c-0.3,0-0.6,0-0.8,0l3.3,5.2c2.6,0,5.3,0,7.9,0.1c3,0.1,4.6,1.9,4.6,4.9c0,2.5-1.9,4.2-4.7,4.3
+                            c-3,0.1-6.1,0.1-9.1,0c-0.9,0-1.2,0.3-1.2,1.2l0,3.2c0,0.9,0.2,1.2,1.2,1.2c2.1-0.1,4.3,0.1,6.5,0c1.3-0.1,2,0.4,2.7,1.4
+                            c2.3,3.5,4.6,7,7,10.5c0.2,0.3,0.6,0.9,0.9,0.9c2,0.1,4,0,6.3,0C14.8,361.7,11.8,357.2,8.7,352.5z"/>
+                        <path id="XMLID_35_" class="st4" d="M-66.6,338.9c-3.1,0-6,0-8.9,0c-2.8,0-5.7,0-8.7,0c0-1.7,0-3.2,0-4.6c0-0.2,0.5-0.6,0.8-0.6
+                            c7.9,0,15.8,0,23.7,0c0.7,0,1,0.2,1,1c-0.1,1.7,0,3.2-1.3,4.8c-5.6,6.8-11,13.8-16.4,20.8c-0.2,0.2-0.3,0.5-0.7,1c0.8,0,1.4,0,2,0
+                            c5.1,0,10.1,0,15.2-0.1l1.1,0l-0.1,5.5l-3.6,0c-4.4,0-13.9,0-20.8,0.1c-1.3,0-1.5-0.5-1.6-1.7c-0.1-2.2,0.4-3.9,1.9-5.6
+                            c5.4-6.5,10.6-13.1,15.8-19.7C-67,339.6-66.9,339.4-66.6,338.9z"/>
+                        <path id="XMLID_7_" class="st4" d="M-31,360.9c-4.1-0.7-6.4-3.8-6.4-8.4c0-5.8,0-11.7,0-17.5c0-0.5,0-0.9-0.1-1.3
+                            c-1.9,0-3.6,0-5.4,0c0,0.6,0,1,0,1.5c0,6.2-0.1,12.4,0.1,18.6c0.1,2,0.6,4.2,1.5,6c2.8,5.5,9.2,7.9,15.2,6.3
+                            c2.4-0.6,4.4-1.7,5.9-3.2l-3.2-4.5C-25.3,360.4-28.2,361.4-31,360.9z"/>
+                        <path id="XMLID_8_" class="st5" d="M-12.7,333.8c-0.9,0-0.7,0-2.5,0c-0.8,0-1.6,0-1.6,0s-0.1,0.9-0.3,1.6
+                            c-0.6,3.2-1.2,6.4-1.9,9.6c-0.8,3.5-1.4,7-2.5,10.3c-0.4,1.2-1,2.3-1.9,3.2l3.2,4.5c1.4-1.4,2.3-3.2,2.8-5.5
+                            c1.7-7.6,3.2-15.3,4.8-22.9C-12.5,334.3-12.6,334.1-12.7,333.8z"/>
+                        <path id="XMLID_33_" class="st4" d="M-53.8,333.7c1.9,0,3.6,0,5.5,0c0,0.6,0,1,0,1.5c0,5.7,0,11.4,0,17.1c0,4.3,0,8.7,0.1,13
+                            c0,1-0.3,1.4-1.3,1.3l-2.9,0c-1.1,0.1-1.5-0.3-1.5-1.5c0.1-6.1,0.1-12.3,0.1-18.4C-53.8,342.4-53.8,338.1-53.8,333.7z"/>
+                    </g>
+                    <rect x="-146.1" y="400.7" class="st6" width="225.4" height="37.8"/>
+				</g>
+				<text x="-33.4" y="400">
+                    <tspan x="-33.4" dy="0" class="st9 st14 st17">Soulbound Token bidez egiaztatu da hurrengo gaitasuna:</tspan>
+                    <tspan x="-33.4" dy="15" class="st7 st8 st15">${courseDetails.name}</tspan>
+                </text>
+                <text x="-33.4" y="455">
+                    <tspan x="-33.4" dy="0" class="st9 st13 st16">Trainer</tspan>
+                    <tspan x="-33.4" dy="15" class="st12 st16" font-size="${trainerNameFontSize}">${courseDetails.trainerName}</tspan>
+                    <tspan x="-33.4" dy="15" class="st9 st13 st16">Iraupena:</tspan>
+                    <tspan x="-33.4" dy="15" class="st12 st10 st16">${courseDetails.durationInHours} ordu</tspan>
+                    <tspan x="-33.4" dy="15" class="st12 st14 st16">${startDate} - ${endDate}</tspan>
+                </text>
+				
+			</svg>
+		`;
+	}
+
+	async function verifyCertificate(studentAddress: string, courseId: number) {
+		try {
+			const isValid = await CourseCertificationService.verifyCertificateOwnership(studentAddress, courseId);
+			const resultElement = document.getElementById('verificationResult');
+
+            const badgeBoxElement = document.querySelector('.badge-box');
+            const instructionsSection = document.querySelector('.instructions-list');
+
+			if (resultElement) {
+				if (isValid) {
+                    const courseDetails = await CourseCertificationService.getCourseDetails(courseId);
+                    const contractAddress = CourseCertificationService.config.courseCertificationAddress;
+                    const etherscanUrl = `https://sepolia.etherscan.io/token/${contractAddress}?a=${studentAddress}&tokenId=${courseId}`;
+                    
+                    const badgeSVG = generateCustomBadgeSVG(courseDetails, courseId);
+                    
+                    resultElement.innerHTML = `
+                        <div class="button-container">
+                        <h3>Certificate Verified Successfully!</h3>
+                        <p>The certificate for Course ID ${courseId} is valid and owned by address: ${studentAddress}</p>
+                        
+                            <a href="${etherscanUrl}" class="home-button etherscan-button" target="_blank" rel="noopener noreferrer">View on Etherscans</a>
+                        </div>
+                    `;
+
+                    const badgeContainer = document.getElementById('badgeContainer');
+                    if (badgeContainer) {
+                        badgeContainer.innerHTML = badgeSVG;
+                    }
+
+                    if (badgeBoxElement instanceof HTMLElement) {
+                        badgeBoxElement.style.display = 'block';
+                    }
+
+                    if (instructionsSection instanceof HTMLElement) {
+                        instructionsSection.style.display = 'none';
+                    }
+				} else {
+					resultElement.innerHTML = `
+						<h3>Certificate Not Found</h3>
+						<p>No valid certificate found for the provided address and course ID.</p>
+					`;
+
+                    if (badgeBoxElement instanceof HTMLElement) {
+                        badgeBoxElement.style.display = 'none';
+                    }
+
+                    if (instructionsSection instanceof HTMLElement) {
+                        instructionsSection.style.display = 'block';
+                    }
+
+				}
+			}
+		} catch (error: unknown) {
+			console.error('Error verifying certificate:', error);
+			const resultElement = document.getElementById('verificationResult');
+			if (resultElement) {
+				resultElement.innerHTML = `
+					<h3>Error Verifying Certificate</h3>
+					<p>An error occurred while verifying the certificate. Please try again or contact support.</p>
+					<p>Error details: ${error instanceof Error ? error.message : 'Unknown error'}</p>
+				`;
+			}
+		}
+	}
+
+	// Verification Form Submission
+	const verificationForm = document.getElementById('verificationForm') as HTMLFormElement;
+	verificationForm?.addEventListener('submit', async (e: Event) => {
+		e.preventDefault();
+		const formData = new FormData(e.target as HTMLFormElement);
+		const studentAddress = formData.get('studentAddress') as string;
+		const courseId = parseInt(formData.get('courseId') as string);
+		
+		await verifyCertificate(studentAddress, courseId);
+	});
+
+	// Initialize Web3
+	document.addEventListener('DOMContentLoaded', async () => {
+		try {
+			await CourseCertificationService.init();
+			console.log('Web3 initialized successfully');
+		} catch (error: unknown) {
+			console.error('Failed to initialize Web3:', error);
+			alert('There was an error connecting to the blockchain. Please try again later.');
+		}
+	});
+</script>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	.top-bar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 2rem;
+	}
+	.home-button, .etherscan-button {
+        background-color: rgba(var(--accent-light), 12%);
+        color: white;
+        text-decoration: none;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        border: 1px solid rgba(var(--accent-light), 25%);
+        display: inline-block;
+        margin-top: 1em;
+    }
+    .home-button:hover, .etherscan-button:hover {
+        background-color: rgba(var(--accent-light), 30%);
+        color: rgba(var(--accent-light), 100%);
+    }
+	.logo-container {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.ziur-logo {
+		max-width: 100%;
+		height: auto;
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		text-align: center;
+		margin-bottom: 1em;
+	}
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+	.instructions {
+		margin-bottom: 2rem;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
+		padding: 1.5rem;
+		border-radius: 8px;
+		text-align: center;
+	}
+	section {
+		margin-bottom: 2em;
+		background: rgba(var(--accent-light), 12%);
+		border: 1px solid rgba(var(--accent-light), 25%);
+		border-radius: 8px;
+		padding: 1.5rem;
+	}
+	form {
+		display: flex;
+		flex-direction: column;
+		gap: 1em;
+	}
+	input {
+		padding: 0.5em;
+		border-radius: 4px;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background-color: rgba(var(--accent-dark), 33%);
+		color: white;
+	}
+	button {
+		background-color: rgba(var(--accent-light), 12%);
+		color: white;
+		text-decoration: none;
+		padding: 0.5em 1em;
+		border-radius: 4px;
+		transition: background-color 0.3s ease, color 0.3s ease;
+		border: 1px solid rgba(var(--accent-light), 25%);
+	}
+	button:hover {
+		background-color: rgba(var(--accent-light), 30%);
+		color: rgba(var(--accent-light), 100%);
+	}
+	.verification-result {
+		margin-top: 1em;
+		padding: 1em;
+		background: rgba(var(--accent-light), 20%);
+		border-radius: 4px;
+	}
+	.instructions-list {
+		background: rgba(var(--accent-light), 15%);
+	}
+	ol {
+		padding-left: 1.5em;
+		margin-bottom: 1em;
+	}
+	li {
+		margin-bottom: 0.5em;
+	}
+	.note {
+		font-style: italic;
+		background: rgba(var(--accent-light), 20%);
+		padding: 0.5em;
+		border-radius: 4px;
+	}
+	.etherscan-link {
+        margin-top: 1em;
+    }
+
+    .etherscan-link a {
+        color: rgba(var(--accent-light), 100%);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .etherscan-link a:hover {
+        color: rgba(var(--accent-light), 80%);
+        text-decoration: underline;
+    }
+    .badge-box {
+        background-color: rgba(255, 255, 255, 0.10); /* White with 15% opacity */
+        border: none;
+        padding: 1.5rem;
+        margin: 2em 0; /* Add vertical margin */
+        width: 100vw; /* Full viewport width */
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+    }
+
+    .badge-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 800px; /* Match the main content width */
+        margin: 0 auto; /* Center the badge container */
+    }
+    
+    .button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1em;
+}
+</style>

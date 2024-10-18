@@ -157,7 +157,7 @@ class CourseCertificationService {
     async getCourseDetails(courseId) {
         await this.init();
         try {
-            const course = await this.courseCertificationContract.methods.getCourseDetails(0/*courseId*/).call();
+            const course = await this.courseCertificationContract.methods.getCourseDetails(courseId).call();
             return {
                 id: courseId,
                 name: course.name,
@@ -402,6 +402,17 @@ class CourseCertificationService {
             return result;
         } catch (error) {
             console.error("Failed to add minter:", error);
+            throw error;
+        }
+    }
+
+    async verifyCertificateOwnership(studentAddress, courseId) {
+        await this.init();
+        try {
+            const balance = await this.courseCertificationContract.methods.balanceOf(studentAddress, courseId).call();
+            return balance > 0;
+        } catch (error) {
+            console.error("Failed to verify certificate ownership:", error);
             throw error;
         }
     }
