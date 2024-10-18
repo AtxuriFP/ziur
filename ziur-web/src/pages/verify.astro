@@ -59,6 +59,7 @@ import Layout from '../layouts/Layout.astro';
 	</main>
 </Layout>
 
+<script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script>
 	import CourseCertificationService from '../../lib/CourseCertificationService';
 
@@ -67,7 +68,7 @@ import Layout from '../layouts/Layout.astro';
 		return date.toLocaleDateString();
 	}
 
-    function generateCustomBadgeSVG(courseDetails: any, courseId: number) {
+    function generateCustomBadgeSVG(courseDetails: any, courseId: number, studentAddress: string) {
 		const startDate = formatDate(courseDetails.startDate);
 		const endDate = formatDate(courseDetails.endDate);
 
@@ -80,6 +81,13 @@ import Layout from '../layouts/Layout.astro';
 		}
     	const courseNameFontSize = adjustFontSize(courseDetails.name, 24, 16);
 		const trainerNameFontSize = adjustFontSize(courseDetails.trainerName, 25, 12);
+
+        const contractAddress = CourseCertificationService.config.courseCertificationAddress;
+        const etherscanUrl = `https://sepolia.etherscan.io/token/${contractAddress}?a=${studentAddress}`;
+        const qr = qrcode(0, 'M');
+        qr.addData(etherscanUrl);
+        qr.make();
+        const qrPath = qr.createSvgTag(4, 0);
 
 		return `
 			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-165 272.8 263.2 296.1">
@@ -160,9 +168,8 @@ import Layout from '../layouts/Layout.astro';
                     </g>
                     <rect x="-146.1" y="400.7" class="st6" width="225.4" height="37.8"/>
 				</g>
-				<text x="-33.4" y="400">
-                    <tspan x="-33.4" dy="0" class="st9 st14 st17">Soulbound Token bidez egiaztatu da hurrengo gaitasuna:</tspan>
-                    <tspan x="-33.4" dy="15" class="st7 st8 st15">${courseDetails.name}</tspan>
+				<text x="-33.4" y="420">
+                    <tspan x="-33.4" dy="10" class="st7 st8 st15">${courseDetails.name}</tspan>
                 </text>
                 <text x="-33.4" y="455">
                     <tspan x="-33.4" dy="0" class="st9 st13 st16">Trainer</tspan>
@@ -171,6 +178,13 @@ import Layout from '../layouts/Layout.astro';
                     <tspan x="-33.4" dy="15" class="st12 st10 st16">${courseDetails.durationInHours} ordu</tspan>
                     <tspan x="-33.4" dy="15" class="st12 st14 st16">${startDate} - ${endDate}</tspan>
                 </text>
+
+                 <!-- QR Code -->
+                <g transform="translate(-57.4, 375)">
+                    <g transform="scale(0.25)">
+                        ${qrPath}
+                    </g>
+                </g>
 				
 			</svg>
 		`;
@@ -190,7 +204,7 @@ import Layout from '../layouts/Layout.astro';
                     const contractAddress = CourseCertificationService.config.courseCertificationAddress;
                     const etherscanUrl = `https://sepolia.etherscan.io/token/${contractAddress}?a=${studentAddress}&tokenId=${courseId}`;
                     
-                    const badgeSVG = generateCustomBadgeSVG(courseDetails, courseId);
+                    const badgeSVG = generateCustomBadgeSVG(courseDetails, courseId, studentAddress);
                     
                     resultElement.innerHTML = `
                         <div class="button-container">
@@ -241,6 +255,8 @@ import Layout from '../layouts/Layout.astro';
 			}
 		}
 	}
+
+    
 
 	// Verification Form Submission
 	const verificationForm = document.getElementById('verificationForm') as HTMLFormElement;
