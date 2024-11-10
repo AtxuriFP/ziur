@@ -1,8 +1,8 @@
 import Web3 from 'web3';
-import CourseCertificationABI from './CourseCertificationABI.json';
-import CertificateMinterABI from './CertificateMinterABI.json';
+import CourseCertificationABI from './CourseCertificationABI_old.json';
+import CertificateMinterABI from './CertificateMinterABI_old.json';
 
-class CourseCertificationService {
+class CourseCertificationService_old {
     constructor() {
         this.web3 = null;
         this.courseCertificationContract = null;
@@ -13,8 +13,8 @@ class CourseCertificationService {
         
         // Configuration object
         this.config = {
-            courseCertificationAddress: '0x87b4d12cb30534548e527df98552ec9393874453',
-            certificateMinterAddress: '0xe94e2654e3aa863b76495259af4430f0a5d77bab', 
+            courseCertificationAddress: '0x670dfe8654c908460a6275b7777df0f64ad17367',
+            certificateMinterAddress: '0x0afebd8328807fdfe84d63eefd2fd39a250cb089', 
             rpcUrl: 'https://sepolia.infura.io/v3/ab7c969b633f41b8a1bde81b685a5142',
         };
     }
@@ -87,12 +87,10 @@ class CourseCertificationService {
                             name: course.name,
                             description: course.description,
                             trainerName: course.trainerName,
-                            organization: course.organization,
                             startDate: new Date(parseInt(course.startDate) * 1000),
                             endDate: new Date(parseInt(course.endDate) * 1000),
                             durationInHours: parseInt(course.durationInHours),
-                            active: course.active,
-                            courseURI: course.courseURI
+                            active: course.active
                         });
 
                     } catch(error){
@@ -120,18 +118,16 @@ class CourseCertificationService {
 
     async createCourse(courseData) {
         await this.init();
-        const { courseName, description, trainerName, organization, startDate, endDate, durationInHours, courseURI } = courseData;
+        const { courseName, description, trainerName, startDate, endDate, durationInHours } = courseData;
 
         try {
             const createCourseMethod = this.courseCertificationContract.methods.createCourse(
                 courseName,
                 description,
                 trainerName,
-                organization,
                 Math.floor(new Date(startDate).getTime() / 1000),
                 Math.floor(new Date(endDate).getTime() / 1000),
-                durationInHours,
-                courseURI
+                durationInHours
             );
             
             // Estimate the gas
@@ -167,12 +163,10 @@ class CourseCertificationService {
                 name: course.name,
                 description: course.description,
                 trainerName: course.trainerName,
-                organization: course.organization,
                 startDate: new Date(parseInt(course.startDate) * 1000),
                 endDate: new Date(parseInt(course.endDate) * 1000),
                 durationInHours: parseInt(course.durationInHours),
-                active: course.active,
-                courseURI: course.courseURI
+                active: course.active
             };
         } catch (error) {
             console.error("Failed to get course details:", error);
@@ -182,7 +176,7 @@ class CourseCertificationService {
 
     async updateCourse(courseData) {
         await this.init();
-        const { editCourseId, courseName, description, trainerName, organization, startDate, endDate, durationInHours, editActive, courseURI } = courseData;
+        const { editCourseId, courseName, description, trainerName, startDate, endDate, durationInHours, editActive } = courseData;
 
         try {
             await this.courseCertificationContract.methods.updateCourse(
@@ -190,12 +184,10 @@ class CourseCertificationService {
                 courseName,
                 description,
                 trainerName,
-                organization,
                 Math.floor(new Date(startDate).getTime() / 1000),
                 Math.floor(new Date(endDate).getTime() / 1000),
                 durationInHours,
-                editActive === 'on',
-                courseURI
+                editActive === 'on'  // Convert checkbox value to boolean
             ).send({ from: this.account });
         } catch (error) {
             console.error("Failed to update course:", error);
@@ -225,15 +217,11 @@ class CourseCertificationService {
         }
     }
 
-    async adminRecoverCertificate(courseId, from, to, reason) {
+    async recoverCertificate(courseId, oldAddress, newAddress) {
         await this.init();
         try {
-            await this.certificateMinterContract.methods.adminRecoverCertificate(
-                courseId, 
-                from, 
-                to,
-                reason
-            ).send({ from: this.account });
+            await this.courseCertificationContract.methods.recover(courseId, oldAddress, newAddress)
+                .send({ from: this.account });
         } catch (error) {
             console.error("Failed to recover certificate:", error);
             throw error;
@@ -417,36 +405,12 @@ class CourseCertificationService {
             throw error;
         }
     }
-    
-    async removeMinter(minterAddress) {
-        await this.init();
-        try {
-            const result = await this.courseCertificationContract.methods.removeMinter(minterAddress)
-                .send({ from: this.account });
-            console.log("Minter removed successfully:", result);
-            return result;
-        } catch (error) {
-            console.error("Failed to remove minter:", error);
-            throw error;
-        }
-    }
 
     async verifyCertificateOwnership(studentAddress, courseId) {
         await this.init();
         try {
-            // Check balance (existing check)
             const balance = await this.courseCertificationContract.methods.balanceOf(studentAddress, courseId).call();
-            if (balance === 0) return false;
-    
-            // Get course details to check active status
-            const courseDetails = await this.courseCertificationContract.methods.getCourseDetails(courseId).call();
-            if (!courseDetails.active) return false;
-    
-            // Verify locked status (soulbound token check)
-            const isLocked = await this.courseCertificationContract.methods.locked(courseId).call();
-            
-            return isLocked && balance > 0;
-    
+            return balance > 0;
         } catch (error) {
             console.error("Failed to verify certificate ownership:", error);
             throw error;
@@ -454,4 +418,4 @@ class CourseCertificationService {
     }
 }
 
-export default new CourseCertificationService();
+export default new CourseCertificationService_old();

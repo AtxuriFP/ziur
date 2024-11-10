@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "@openzeppelin/contracts/utils/Nonces.sol";
-import "./CourseCertification.sol"; // Make sure this path is correct
+import "./CourseCertification.sol";
 
 contract CertificateMinter is Ownable, Nonces {
     using MessageHashUtils for bytes32;
@@ -47,11 +47,18 @@ contract CertificateMinter is Ownable, Nonces {
         emit CertificateMinted(to, courseId);
     }
 
-    function recover(address oldOwner, address newOwner, uint256 courseId) external onlyOwner {
-        courseCertification.recover(courseId, oldOwner, newOwner);
+    /* ============ Admin Functions ============ */
+    function adminRecoverCertificate(
+        uint256 courseId,
+        address from,
+        address to,
+        string calldata reason
+    ) external onlyOwner {
+        courseCertification.adminRecoverCertificate(courseId, from, to, reason);
     }
 
     function setSigner(address newSigner) external onlyOwner {
+        require(newSigner != address(0), "Invalid signer address");
         address oldSigner = signer;
         signer = newSigner;
         emit SignerChanged(oldSigner, newSigner);

@@ -40,6 +40,9 @@ import Layout from '../../layouts/Layout.astro';
 				<label for="trainerName">Trainer Name:</label>
 				<input type="text" id="trainerName" name="trainerName" required>
 
+				<label for="organization">Organization:</label>
+   				<input type="text" id="organization" name="organization" required>
+
 				<label for="startDate">Start Date:</label>
 				<input type="date" id="startDate" name="startDate" required>
 
@@ -48,6 +51,9 @@ import Layout from '../../layouts/Layout.astro';
 
 				<label for="durationInHours">Duration (hours):</label>
 				<input type="number" id="durationInHours" name="durationInHours" required>
+
+				<label for="courseURI">Metadata URI:</label>
+				<input type="text" id="courseURI" name="courseURI" required>
 
 				<button type="submit">Add Course</button>
 			</form>
@@ -67,6 +73,9 @@ import Layout from '../../layouts/Layout.astro';
 					<label for="editTrainerName">Trainer Name:</label>
 					<input type="text" id="editTrainerName" name="trainerName" required>
 
+					<label for="editOrganization">Organization:</label>
+    				<input type="text" id="editOrganization" name="organization" required>
+
 					<label for="editStartDate">Start Date:</label>
 					<input type="date" id="editStartDate" name="startDate" required>
 
@@ -75,6 +84,9 @@ import Layout from '../../layouts/Layout.astro';
 
 					<label for="editDurationInHours">Duration (hours):</label>
 					<input type="number" id="editDurationInHours" name="durationInHours" required>
+
+					<label for="editCourseURI">Metadata URI:</label>
+					<input type="text" id="editCourseURI" name="courseURI" required>
 
 					<label for="editActive" class="checkbox-label">
 						<input type="checkbox" id="editActive" name="editActive">
@@ -98,10 +110,12 @@ import Layout from '../../layouts/Layout.astro';
 		name: string;
 		description: string;
 		trainerName: string;
+		organization: string;
 		startDate: Date;
 		endDate: Date;
 		durationInHours: number;
 		active: boolean;
+		courseURI:string;
 	}
 
 	function formatDate(date: Date): string {
@@ -117,10 +131,12 @@ import Layout from '../../layouts/Layout.astro';
 					courseListElement.innerHTML = courses.map((course: Course) => `
 						<div class="course-item">
 							<h3>${course.name}</h3>
+							<p>Organization: ${course.organization}</p>
 							<p>Trainer: ${course.trainerName}</p>
 							<p>Duration: ${course.durationInHours} hours</p>
 							<p>Start Date: ${formatDate(course.startDate)}</p>
 							<p>End Date: ${formatDate(course.endDate)}</p>
+							<p>Metadata URI: ${course.courseURI}</p>
 							<p>Status: ${course.active ? 'Active' : 'Inactive'}</p>
 							<button class="edit-course" data-course-id="${course.id}">Edit</button>
 						</div>
@@ -155,19 +171,23 @@ import Layout from '../../layouts/Layout.astro';
 				const editCourseNameInput = document.getElementById('editCourseName') as HTMLInputElement;
 				const editDescriptionInput = document.getElementById('editDescription') as HTMLTextAreaElement;
 				const editTrainerNameInput = document.getElementById('editTrainerName') as HTMLInputElement;
+				const editOrganizationInput = document.getElementById('editOrganization') as HTMLInputElement;
 				const editStartDateInput = document.getElementById('editStartDate') as HTMLInputElement;
 				const editEndDateInput = document.getElementById('editEndDate') as HTMLInputElement;
 				const editDurationInHoursInput = document.getElementById('editDurationInHours') as HTMLInputElement;
 				const editActiveCheckbox = document.getElementById('editActive') as HTMLInputElement;
+				const editCourseURI = document.getElementById('editCourseURI') as HTMLInputElement;
 				
 				if (editCourseIdInput) editCourseIdInput.value = courseId;
 				if (editCourseNameInput) editCourseNameInput.value = course.name;
 				if (editDescriptionInput) editDescriptionInput.value = course.description;
 				if (editTrainerNameInput) editTrainerNameInput.value = course.trainerName;
+				if (editOrganizationInput) editOrganizationInput.value = course.organization;
 				if (editStartDateInput) editStartDateInput.value = formatDate(course.startDate);
 				if (editEndDateInput) editEndDateInput.value = formatDate(course.endDate);
 				if (editDurationInHoursInput) editDurationInHoursInput.value = course.durationInHours.toString();
 				if (editActiveCheckbox) editActiveCheckbox.checked = course.active;
+				if (editCourseURI) editCourseURI.value = course.courseURI;
 				
 				const editCourseModal = document.getElementById('editCourseModal');
 				if (editCourseModal) editCourseModal.style.display = 'block';

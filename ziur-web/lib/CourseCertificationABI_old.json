@@ -218,12 +218,6 @@
 				"internalType": "address",
 				"name": "to",
 				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "reason",
-				"type": "string"
 			}
 		],
 		"name": "CertificateRecovered",
@@ -241,19 +235,13 @@
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "name",
+				"name": "courseName",
 				"type": "string"
 			},
 			{
 				"indexed": false,
 				"internalType": "string",
 				"name": "trainerName",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "organization",
 				"type": "string"
 			},
 			{
@@ -273,12 +261,6 @@
 				"internalType": "uint256",
 				"name": "durationInHours",
 				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "courseURI",
-				"type": "string"
 			}
 		],
 		"name": "CourseCreated",
@@ -296,19 +278,13 @@
 			{
 				"indexed": false,
 				"internalType": "string",
-				"name": "name",
+				"name": "courseName",
 				"type": "string"
 			},
 			{
 				"indexed": false,
 				"internalType": "string",
 				"name": "trainerName",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "organization",
 				"type": "string"
 			},
 			{
@@ -334,34 +310,9 @@
 				"internalType": "bool",
 				"name": "active",
 				"type": "bool"
-			},
-			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "courseURI",
-				"type": "string"
 			}
 		],
 		"name": "CourseUpdated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "status",
-				"type": "bool"
-			}
-		],
-		"name": "LockingStatusChanged",
 		"type": "event"
 	},
 	{
@@ -544,34 +495,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "courseId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "string",
-				"name": "reason",
-				"type": "string"
-			}
-		],
-		"name": "adminRecoverCertificate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "account",
 				"type": "address"
@@ -643,11 +566,6 @@
 				"type": "string"
 			},
 			{
-				"internalType": "string",
-				"name": "organization",
-				"type": "string"
-			},
-			{
 				"internalType": "uint256",
 				"name": "startDate",
 				"type": "uint256"
@@ -666,11 +584,6 @@
 				"internalType": "bool",
 				"name": "active",
 				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "courseURI",
-				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -694,11 +607,6 @@
 				"type": "string"
 			},
 			{
-				"internalType": "string",
-				"name": "organization",
-				"type": "string"
-			},
-			{
 				"internalType": "uint256",
 				"name": "startDate",
 				"type": "uint256"
@@ -712,11 +620,6 @@
 				"internalType": "uint256",
 				"name": "durationInHours",
 				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "courseURI",
-				"type": "string"
 			}
 		],
 		"name": "createCourse",
@@ -771,11 +674,6 @@
 						"type": "string"
 					},
 					{
-						"internalType": "string",
-						"name": "organization",
-						"type": "string"
-					},
-					{
 						"internalType": "uint256",
 						"name": "startDate",
 						"type": "uint256"
@@ -794,11 +692,6 @@
 						"internalType": "bool",
 						"name": "active",
 						"type": "bool"
-					},
-					{
-						"internalType": "string",
-						"name": "courseURI",
-						"type": "string"
 					}
 				],
 				"internalType": "struct CourseCertification.Course",
@@ -813,12 +706,12 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "account",
 				"type": "address"
 			},
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "operator",
 				"type": "address"
 			}
 		],
@@ -849,25 +742,6 @@
 		"name": "issueCertificate",
 		"outputs": [],
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "locked",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -933,6 +807,29 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "courseId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "address",
+				"name": "from",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "to",
+				"type": "address"
+			}
+		],
+		"name": "recover",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -1007,7 +904,7 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "value",
+				"name": "amount",
 				"type": "uint256"
 			},
 			{
@@ -1025,16 +922,29 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "",
+				"name": "operator",
 				"type": "address"
 			},
 			{
 				"internalType": "bool",
-				"name": "",
+				"name": "approved",
 				"type": "bool"
 			}
 		],
 		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "newBaseURI",
+				"type": "string"
+			}
+		],
+		"name": "setBaseURI",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -1146,11 +1056,6 @@
 				"type": "string"
 			},
 			{
-				"internalType": "string",
-				"name": "organization",
-				"type": "string"
-			},
-			{
 				"internalType": "uint256",
 				"name": "startDate",
 				"type": "uint256"
@@ -1169,11 +1074,6 @@
 				"internalType": "bool",
 				"name": "active",
 				"type": "bool"
-			},
-			{
-				"internalType": "string",
-				"name": "courseURI",
-				"type": "string"
 			}
 		],
 		"name": "updateCourse",

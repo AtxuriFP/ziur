@@ -59,25 +59,28 @@ import Layout from '../../layouts/Layout.astro';
 	interface Course {
 		id: number;
 		name: string;
+		organization: string;
 	}
 
 	async function loadCourses() {
-		try {
-			const courses = await CourseCertificationService.getCourses();
-			const courseSelect = document.getElementById('courseSelect') as HTMLSelectElement;
-			courses.forEach((course: Course) => {
-				const option = document.createElement('option');
-				option.value = course.id.toString();
-				option.textContent = `${course.name} (ID: ${course.id})`;
-				courseSelect.appendChild(option);
-			});
-		} catch (error) {
-			console.error('Error loading courses:', error);
-			alert('Failed to load courses. Please refresh the page and try again.');
-		}
-	}
+    try {
+        const courses = await CourseCertificationService.getCourses();
+        const courseSelect = document.getElementById('courseSelect') as HTMLSelectElement;
+        courses
+            .filter(course => course.active)  // Only show active courses
+            .forEach((course: Course) => {
+                const option = document.createElement('option');
+                option.value = course.id.toString();
+                option.textContent = `${course.name} (ID: ${course.id}) - ${course.organization}`;
+                courseSelect.appendChild(option);
+            });
+    } catch (error) {
+        console.error('Error loading courses:', error);
+        alert('Failed to load courses. Please refresh the page and try again.');
+    }
+}
 
-	async function generateMintingRequest(studentAddress: string, courseId: number, expirationTime: number) {
+	async function generateMintingRequest(studentAddress: string, courseId: number) {
 		try {
 			const result = await CourseCertificationService.generateMintingRequest(studentAddress, courseId);
 			const resultElement = document.getElementById('mintingResult');
@@ -86,6 +89,7 @@ import Layout from '../../layouts/Layout.astro';
 					<h3>Minting Request Generated</h3>
 					<p>Student Address: ${result.studentAddress}</p>
 					<p>Course ID: ${result.courseId}</p>
+					<p>Nonce: ${result.nonce}</p>
 					<p>Signature: ${result.signature}</p>
 				`;
 			}
@@ -132,9 +136,8 @@ import Layout from '../../layouts/Layout.astro';
 		const formData = new FormData(e.target as HTMLFormElement);
 		const studentAddress = formData.get('studentAddress') as string;
 		const courseId = parseInt(formData.get('courseId') as string);
-		const expirationTime = parseInt(formData.get('expirationTime') as string);
-		
-		await generateMintingRequest(studentAddress, courseId, expirationTime);
+				
+		await generateMintingRequest(studentAddress, courseId);
 	});
 
 	// Load courses and recent certificates when the page loads

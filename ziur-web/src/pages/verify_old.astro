@@ -61,7 +61,7 @@ import Layout from '../layouts/Layout.astro';
 
 <script is:inline src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
 <script>
-	import CourseCertificationService from '../../lib/CourseCertificationService';
+	import CourseCertificationService_old from '../../lib/CourseCertificationService_old';
 
 	function formatDate(timestamp: any): string {
 		const date = new Date(typeof timestamp === 'string' ? parseInt(timestamp) * 1000 : timestamp);
@@ -82,7 +82,7 @@ import Layout from '../layouts/Layout.astro';
     	const courseNameFontSize = adjustFontSize(courseDetails.name, 24, 16);
 		const trainerNameFontSize = adjustFontSize(courseDetails.trainerName, 25, 12);
 
-        const contractAddress = CourseCertificationService.config.courseCertificationAddress;
+        const contractAddress = CourseCertificationService_old.config.courseCertificationAddress;
         const etherscanUrl = `https://sepolia.etherscan.io/token/${contractAddress}?a=${studentAddress}`;
         const qr = qrcode(0, 'M');
         qr.addData(etherscanUrl);
@@ -172,14 +172,12 @@ import Layout from '../layouts/Layout.astro';
                     <tspan x="-33.4" dy="10" class="st7 st8 st15">${courseDetails.name}</tspan>
                 </text>
                 <text x="-33.4" y="455">
-					<tspan x="-33.4" dy="0" class="st9 st13 st16">Trainer</tspan>
-					<tspan x="-33.4" dy="15" class="st12 st16" font-size="${trainerNameFontSize}">${courseDetails.trainerName}</tspan>
-					<tspan x="-33.4" dy="15" class="st9 st13 st16">Organization</tspan>
-					<tspan x="-33.4" dy="15" class="st12 st16" font-size="${trainerNameFontSize}">${courseDetails.organization}</tspan>
-					<tspan x="-33.4" dy="15" class="st9 st13 st16">Iraupena:</tspan>
-					<tspan x="-33.4" dy="15" class="st12 st10 st16">${courseDetails.durationInHours} ordu</tspan>
-					<tspan x="-33.4" dy="15" class="st12 st14 st16">${startDate} - ${endDate}</tspan>
-				</text>
+                    <tspan x="-33.4" dy="0" class="st9 st13 st16">Trainer</tspan>
+                    <tspan x="-33.4" dy="15" class="st12 st16" font-size="${trainerNameFontSize}">${courseDetails.trainerName}</tspan>
+                    <tspan x="-33.4" dy="15" class="st9 st13 st16">Iraupena:</tspan>
+                    <tspan x="-33.4" dy="15" class="st12 st10 st16">${courseDetails.durationInHours} ordu</tspan>
+                    <tspan x="-33.4" dy="15" class="st12 st14 st16">${startDate} - ${endDate}</tspan>
+                </text>
 
                  <!-- QR Code -->
                 <g transform="translate(-57.4, 375)">
@@ -194,7 +192,7 @@ import Layout from '../layouts/Layout.astro';
 
 	async function verifyCertificate(studentAddress: string, courseId: number) {
 		try {
-			const isValid = await CourseCertificationService.verifyCertificateOwnership(studentAddress, courseId);
+			const isValid = await CourseCertificationService_old.verifyCertificateOwnership(studentAddress, courseId);
 			const resultElement = document.getElementById('verificationResult');
 
             const badgeBoxElement = document.querySelector('.badge-box');
@@ -202,8 +200,8 @@ import Layout from '../layouts/Layout.astro';
 
 			if (resultElement) {
 				if (isValid) {
-                    const courseDetails = await CourseCertificationService.getCourseDetails(courseId);
-                    const contractAddress = CourseCertificationService.config.courseCertificationAddress;
+                    const courseDetails = await CourseCertificationService_old.getCourseDetails(courseId);
+                    const contractAddress = CourseCertificationService_old.config.courseCertificationAddress;
                     const etherscanUrl = `https://sepolia.etherscan.io/token/${contractAddress}?a=${studentAddress}&tokenId=${courseId}`;
                     
                     const badgeSVG = generateCustomBadgeSVG(courseDetails, courseId, studentAddress);
@@ -274,7 +272,7 @@ import Layout from '../layouts/Layout.astro';
 	// Initialize Web3
 	document.addEventListener('DOMContentLoaded', async () => {
 		try {
-			await CourseCertificationService.init();
+			await CourseCertificationService_old.init();
 			console.log('Web3 initialized successfully');
 		} catch (error: unknown) {
 			console.error('Failed to initialize Web3:', error);
