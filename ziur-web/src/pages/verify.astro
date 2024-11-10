@@ -171,18 +171,18 @@ import Layout from '../layouts/Layout.astro';
 				<text x="-33.4" y="420">
                     <tspan x="-33.4" dy="10" class="st7 st8 st15">${courseDetails.name}</tspan>
                 </text>
-                <text x="-33.4" y="455">
+                <text x="-33.4" y="450">
 					<tspan x="-33.4" dy="0" class="st9 st13 st16">Trainer</tspan>
 					<tspan x="-33.4" dy="15" class="st12 st16" font-size="${trainerNameFontSize}">${courseDetails.trainerName}</tspan>
 					<tspan x="-33.4" dy="15" class="st9 st13 st16">Organization</tspan>
 					<tspan x="-33.4" dy="15" class="st12 st16" font-size="${trainerNameFontSize}">${courseDetails.organization}</tspan>
 					<tspan x="-33.4" dy="15" class="st9 st13 st16">Iraupena:</tspan>
 					<tspan x="-33.4" dy="15" class="st12 st10 st16">${courseDetails.durationInHours} ordu</tspan>
-					<tspan x="-33.4" dy="15" class="st12 st14 st16">${startDate} - ${endDate}</tspan>
+					<tspan x="-33.4" dy="7" class="st12 st17 st16">${startDate} - ${endDate}</tspan>
 				</text>
 
                  <!-- QR Code -->
-                <g transform="translate(-57.4, 375)">
+                <g transform="translate(-57.4, 372)">
                     <g transform="scale(0.25)">
                         ${qrPath}
                     </g>
