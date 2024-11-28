@@ -59,7 +59,52 @@ import Layout from '../layouts/Layout.astro';
     function createCertificateCard(course: Course): string {
         return `
             <div class="card" onclick="this.classList.toggle('is-flipped')">
-                <!-- Card HTML remains the same -->
+                <div class="card-face card-front">
+                    <div class="card-header">
+                        <div class="award-icon">🏆</div>
+                        <div class="certificate-id">
+                            <span class="label">ZIUR Certificate</span>
+                            <span class="id">#${course.id}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-title">
+                        <h2>${course.name}</h2>
+                        <p>${course.organization}</p>
+                    </div>
+
+                    <div class="card-stats">
+                        <div class="stat">
+                            <span class="icon">⏱️</span>
+                            <span>${course.durationInHours}h</span>
+                        </div>
+                        <div class="stat">
+                            <span class="icon">👨‍🏫</span>
+                            <span>${course.trainerName}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-face card-back">
+                    <h3>Course Details</h3>
+                    <div class="back-content">
+                        <div class="detail">
+                            <span class="icon">📅</span>
+                            <div>
+                                <p>Start: ${formatDate(course.startDate)}</p>
+                                <p>End: ${formatDate(course.endDate)}</p>
+                            </div>
+                        </div>
+                        <div class="detail">
+                            <span class="icon">📚</span>
+                            <p>${course.description}</p>
+                        </div>
+                        <div class="detail">
+                            <span class="icon">🏢</span>
+                            <p>${course.organization}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
