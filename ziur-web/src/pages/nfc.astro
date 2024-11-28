@@ -1,149 +1,161 @@
 ---
 import Layout from '../layouts/Layout.astro';
 ---
-
 <Layout title="NFC Irakurlea">
-	<main>
-		<div class="logo-container">
-			<img
-				src="/logo-ziur.png"
-				alt="ZIUR Logo"
-				class="custom-logo"
-				width="200"
-				height="200"
-			/>
-		</div>
-		<h1>NFC <span class="text-gradient">Irakurlea</span></h1>
-		<div class="instructions" id="status">
-			NFC txartela irakurtzeko prest...
-		</div>
-		<div class="address-display" id="addressDisplay">
-			<!-- Ethereum address will be displayed here -->
-		</div>
-	</main>
+    <main>
+        <div class="logo-container">
+            <img
+                src="/logo-ziur.png"
+                alt="ZIUR Logo"
+                class="custom-logo"
+                width="200"
+                height="200"
+            />
+        </div>
+        <h1>NFC <span class="text-gradient">Irakurlea</span></h1>
+        <button id="startScan" class="scan-button">Hasi eskaneatzea</button>
+        <div class="instructions" id="status">
+            Sakatu botoia NFC irakurketa hasteko
+        </div>
+        <div class="address-display" id="addressDisplay">
+            <!-- Ethereum address will be displayed here -->
+        </div>
+    </main>
 </Layout>
 
 <style>
-	main {
-		margin: auto;
-		padding: 1rem;
-		width: 800px;
-		max-width: calc(100% - 2rem);
-		color: white;
-		font-size: 20px;
-		line-height: 1.6;
-	}
-	.logo-container {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		margin-bottom: 2rem;
-	}
-	.custom-logo {
-		max-width: 100%;
-		height: auto;
-	}
-	h1 {
-		font-size: 3rem;
-		font-weight: 700;
-		line-height: 1;
-		text-align: center;
-		margin-top: 1em;
-		margin-bottom: 1em;
-	}
-	.text-gradient {
-		background-image: var(--accent-gradient);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-size: 400%;
-		background-position: 0%;
-	}
-	.instructions {
-		margin-bottom: 2rem;
-		border: 1px solid rgba(var(--accent-light), 25%);
-		background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
-		padding: 1.5rem;
-		border-radius: 8px;
-		text-align: center;
-	}
-	.address-display {
-		text-align: center;
-		font-family: monospace;
-		font-size: 1.2rem;
-		padding: 1rem;
-		word-break: break-all;
-	}
+    main {
+        margin: auto;
+        padding: 1rem;
+        width: 800px;
+        max-width: calc(100% - 2rem);
+        color: white;
+        font-size: 20px;
+        line-height: 1.6;
+    }
+    .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    .custom-logo {
+        max-width: 100%;
+        height: auto;
+    }
+    .scan-button {
+        display: block;
+        margin: 2rem auto;
+        padding: 1rem 2rem;
+        background: var(--accent-gradient);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+    }
+    h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+    .text-gradient {
+        background-image: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-size: 400%;
+        background-position: 0%;
+    }
+    .instructions {
+        margin-bottom: 2rem;
+        border: 1px solid rgba(var(--accent-light), 25%);
+        background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+    }
+    .address-display {
+        text-align: center;
+        font-family: monospace;
+        font-size: 1.2rem;
+        padding: 1rem;
+        word-break: break-all;
+    }
 </style>
 
 <script>
-	interface NFDReading {
-		message: {
-			records: {
-				recordType: string;
-				data: ArrayBuffer;
-			}[];
-		};
-	}
+    interface NFDReading {
+        message: {
+            records: {
+                recordType: string;
+                data: ArrayBuffer;
+            }[];
+        };
+    }
+    interface NFDError extends Error {
+        name: string;
+    }
+    declare class NDEFReader {
+        constructor();
+        scan(): Promise<void>;
+        addEventListener(type: string, callback: (reading: NFDReading) => void): void;
+    }
 
-	interface NFDError extends Error {
-		name: string;
-	}
+    const startButton = document.getElementById('startScan');
+    const statusElement = document.getElementById('status');
+    const addressDisplay = document.getElementById('addressDisplay');
 
-	declare class NDEFReader {
-		constructor();
-		scan(): Promise<void>;
-		addEventListener(type: string, callback: (reading: NFDReading) => void): void;
-	}
+    async function startNFCReader() {
+        if (!statusElement || !addressDisplay) {
+            console.error('Required DOM elements not found');
+            return;
+        }
 
-	const statusElement = document.getElementById('status');
-	const addressDisplay = document.getElementById('addressDisplay');
+        try {
+            if ('NDEFReader' in window) {
+                const ndef = new NDEFReader();
+                await ndef.scan();
+                statusElement.textContent = 'NFC prest - Ukitu txartela';
+                
+                ndef.addEventListener('reading', (reading: NFDReading) => {
+                    for (const record of reading.message.records) {
+                        if (record.recordType === "text") {
+                            const textDecoder = new TextDecoder();
+                            const address = textDecoder.decode(record.data);
+                            
+                            if (address.match(/^0x[a-fA-F0-9]{40}$/)) {
+                                addressDisplay.textContent = address;
+                                statusElement.textContent = 'Ethereum helbidea aurkitu da';
+                            } else {
+                                statusElement.textContent = 'NFC txartelak ez du Ethereum helbide baliogarririk';
+                            }
+                        }
+                    }
+                });
+            } else {
+                statusElement.textContent = 'Gailu honek ez du NFC euskarririk';
+            }
+        } catch (error) {
+            const nfcError = error as NFDError;
+            if (nfcError.name === 'NotAllowedError') {
+                statusElement.textContent = 'Mesedez, eman NFC baimena';
+            } else if (nfcError.name === 'NotSupportedError') {
+                statusElement.textContent = 'NFCa ez dago erabilgarri edo desgaituta dago';
+            } else {
+                statusElement.textContent = 'Errorea: ' + nfcError.message;
+            }
+        }
+    }
 
-	async function startNFCReader() {
-		if (!statusElement || !addressDisplay) {
-			console.error('Required DOM elements not found');
-			return;
-		}
+    startButton?.addEventListener('click', startNFCReader);
 
-		try {
-			if ('NDEFReader' in window) {
-				const ndef = new NDEFReader();
-				
-				await ndef.scan();
-				statusElement.textContent = 'NFC prest - Ukitu txartela';
-				
-				ndef.addEventListener('reading', (reading: NFDReading) => {
-					for (const record of reading.message.records) {
-						if (record.recordType === "text") {
-							// Decode the text record
-							const textDecoder = new TextDecoder();
-							const address = textDecoder.decode(record.data);
-							
-							// Validate if it looks like an Ethereum address
-							if (address.match(/^0x[a-fA-F0-9]{40}$/)) {
-								addressDisplay.textContent = address;
-								statusElement.textContent = 'Ethereum helbidea aurkitu da';
-							} else {
-								statusElement.textContent = 'NFC txartelak ez du Ethereum helbide baliogarririk';
-							}
-						}
-					}
-				});
-
-			} else {
-				statusElement.textContent = 'Gailu honek ez du NFC euskarririk';
-			}
-		} catch (error) {
-			const nfcError = error as NFDError;
-			if (nfcError.name === 'NotAllowedError') {
-				statusElement.textContent = 'Mesedez, eman NFC baimena';
-			} else if (nfcError.name === 'NotSupportedError') {
-				statusElement.textContent = 'NFCa ez dago erabilgarri edo desgaituta dago';
-			} else {
-				statusElement.textContent = 'Errorea: ' + nfcError.message;
-			}
-		}
-	}
-
-	// Start NFC reading when page loads
-	document.addEventListener('DOMContentLoaded', startNFCReader);
+    // Handle visibility changes
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            statusElement!.textContent = 'Sakatu botoia NFC irakurketa hasteko';
+        }
+    });
 </script>
