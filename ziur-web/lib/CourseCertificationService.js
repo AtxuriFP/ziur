@@ -28,23 +28,30 @@ class CourseCertificationService {
     
         try {
             
-            if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
-                this.web3 = new Web3(window.ethereum);
-                window.ethereum.enable();
-                console.log("MetaMask connected");
-            } else {
-                console.log("Using HTTP Provider");
-                this.web3 = new Web3(new Web3.providers.HttpProvider(this.config.rpcUrl));
-            }
+            // Always set up HTTP Provider first
+            this.web3 = new Web3(new Web3.providers.HttpProvider(this.config.rpcUrl));
             
-            //this.web3 = new Web3(new Web3.providers.HttpProvider(this.config.rpcUrl));
-            const accounts = await this.web3.eth.getAccounts();
-            this.account = accounts[0];
-            console.log("Account:", this.account);
-    
-            this.chainId = await this.web3.eth.getChainId();
-            console.log("Chain ID:", this.chainId);
+            // Try to connect to MetaMask if available
+            if (typeof window !== 'undefined' && typeof window.ethereum !== 'undefined') {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    this.web3 = new Web3(window.ethereum);
+                    window.ethereum.enable();
+                    console.log("MetaMask connected");
+                    
+                    const accounts = await this.web3.eth.getAccounts();
+                    this.account = accounts[0];
+                    console.log("Account:", this.account);
+                    
+                    this.chainId = await this.web3.eth.getChainId();
+                    console.log("Chain ID:", this.chainId);
+                } catch (walletError) {
+                    console.log("Wallet connection failed, using HTTP Provider", walletError);
+                    // Continue with HTTP Provider if wallet connection fails
+                }
+            } else {
+                console.log("No wallet detected, using HTTP Provider");
+            }
     
             this.courseCertificationContract = new this.web3.eth.Contract(
                 CourseCertificationABI,

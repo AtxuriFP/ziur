@@ -68,7 +68,7 @@ import Layout from '../layouts/Layout.astro';
         try {
             const courses = await CourseCertificationService.getCourses();
             const validCertificates = await Promise.all(
-                courses.map(async (course) => {
+                courses.map(async (course: Course) => {
                     const isValid = await CourseCertificationService.verifyCertificateOwnership(address, course.id);
                     return isValid ? course : null;
                 })
