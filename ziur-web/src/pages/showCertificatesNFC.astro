@@ -181,10 +181,29 @@ import Layout from '../layouts/Layout.astro';
             }
         }
     }
+    async function startNFCReader_test(): Promise<void> {
+        const statusElement = document.getElementById('status');
+        if (!statusElement) return;
+        
+        try {
+            const address = "0x53Efde8F0d0173Ce30694098B466caef9c6d98A1";
+            displayCertificates(address);
+        } catch (error) {
+            if (error instanceof Error) {
+                if (error.name === 'NotAllowedError') {
+                    statusElement.textContent = 'Please enable NFC permissions';
+                } else if (error.name === 'NotSupportedError') {
+                    statusElement.textContent = 'NFC is unavailable or disabled';
+                } else {
+                    statusElement.textContent = `Error: ${error.message}`;
+                }
+            }
+        }
+    }
 
     // Event listeners with null checks
     const scanButton = document.getElementById('startScan');
-    scanButton?.addEventListener('click', startNFCReader);
+    scanButton?.addEventListener('click', startNFCReader_test);
 
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden && !certificatesDisplayed) {
